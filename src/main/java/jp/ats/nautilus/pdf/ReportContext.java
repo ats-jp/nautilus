@@ -50,16 +50,16 @@ public class ReportContext {
 		List<String> buffer = U.newLinkedList();
 
 		String file = fileHolder.get();
-		if (U.isAvailable(file)) buffer.add("file:[" + file + "]");
+		if (U.presents(file)) buffer.add("file:[" + file + "]");
 
 		String page = pageHolder.get();
-		if (U.isAvailable(page)) buffer.add("page:[" + page + "]");
+		if (U.presents(page)) buffer.add("page:[" + page + "]");
 
 		String record = recordHolder.get();
-		if (U.isAvailable(record)) buffer.add("record:[" + record + "]");
+		if (U.presents(record)) buffer.add("record:[" + record + "]");
 
 		String field = fieldHolder.get();
-		if (U.isAvailable(field)) buffer.add("field:[" + field + "]");
+		if (U.presents(field)) buffer.add("field:[" + field + "]");
 
 		return U.join(buffer, " ");
 	}

@@ -39,7 +39,7 @@ public class TextFieldDrawer extends FieldDrawer {
 			chrsiz.verticalSize,
 			length);
 
-		if (!U.isAvailable(value)) return;
+		if (!U.presents(value)) return;
 
 		page.addText(
 			startLine,

@@ -21,9 +21,9 @@ class Condition {
 	static boolean matches(String conditionString) {
 		Matcher matcher = pattern.matcher(conditionString);
 		if (!matcher.matches()) return false;
-		if (U.isAvailable(matcher.group(2).trim())
-			|| U.isAvailable(matcher.group(3).trim())
-			|| U.isAvailable(matcher.group(4).trim())) return true;
+		if (U.presents(matcher.group(2).trim())
+			|| U.presents(matcher.group(3).trim())
+			|| U.presents(matcher.group(4).trim())) return true;
 
 		return false;
 	}
@@ -67,7 +67,7 @@ class Condition {
 	}
 
 	private void parseAndAppend(String unitString) {
-		if (!U.isAvailable(unitString.trim())) return;
+		if (!U.presents(unitString.trim())) return;
 
 		ConditionUnit unit = new ConditionUnit(
 			!unitString.startsWith("N"),

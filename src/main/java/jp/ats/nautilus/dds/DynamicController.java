@@ -41,7 +41,7 @@ public class DynamicController {
 		Configure configure = null;
 		for (String line : new TextReader(dynamicConfigures.toUri().toURL())
 			.readLinesAsIterator()) {
-			if (!U.isAvailable(line)) continue;
+			if (!U.presents(line)) continue;
 
 			String[] elements = line.split("\\s");
 			if (ddsName.equals(elements[0])) {

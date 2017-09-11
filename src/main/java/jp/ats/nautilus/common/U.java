@@ -267,22 +267,8 @@ public class U {
 		return clone;
 	}
 
-	public static boolean isAvailable(String value) {
+	public static boolean presents(String value) {
 		return value != null && !value.equals("");
-	}
-
-	public static boolean isAvailable(String... values) {
-		for (String value : values) {
-			if (isAvailable(value)) return true;
-		}
-		return false;
-	}
-
-	public static boolean isAllValuesAvailable(String... values) {
-		for (String value : values) {
-			if (!isAvailable(value)) return false;
-		}
-		return true;
 	}
 
 	/**

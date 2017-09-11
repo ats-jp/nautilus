@@ -48,7 +48,7 @@ public class DDSFile {
 						throw new IllegalStateException("参照はサポートされていません");
 
 					String conditionString = line.substring(6, 16);
-					if (U.isAvailable(conditionString.trim())) {
+					if (U.presents(conditionString.trim())) {
 						if (condition == null) condition = new Condition();
 						condition.append(conditionString);
 					}
@@ -57,7 +57,7 @@ public class DDSFile {
 					String columnIndex = line.substring(41, 44).trim();
 
 					//フィールド定義
-					if (U.isAvailable(rowIndex) || U.isAvailable(columnIndex)) {
+					if (U.presents(rowIndex) || U.presents(columnIndex)) {
 						ReportContext.endField();
 
 						currentField = new DDSField(
@@ -79,7 +79,7 @@ public class DDSFile {
 				}
 
 				String body = line.substring(44).trim();
-				if (!U.isAvailable(body)) continue;
+				if (!U.presents(body)) continue;
 
 				ConditionHolder conditionable;
 				if (currentField != null) {

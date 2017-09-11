@@ -20,7 +20,7 @@ public class ConfigUtilities {
 
 		String line = lines[0].trim();
 
-		if (!U.isAvailable(line)) return null;
+		if (!U.presents(line)) return null;
 
 		File outputDirecotory = new File(line);
 		if (!outputDirecotory.exists()) throw new IllegalStateException(
@@ -39,7 +39,7 @@ public class ConfigUtilities {
 
 		String line = lines[0].trim();
 
-		if (!U.isAvailable(line)) return null;
+		if (!U.presents(line)) return null;
 
 		String[] columns = line.split("\\t");
 

@@ -13,6 +13,7 @@ public class NewPageFinder {
 		} else {
 			//改ページ
 			if (number < currentPosition + 1) {
+				currentPosition = 0;
 				return true;
 			}
 

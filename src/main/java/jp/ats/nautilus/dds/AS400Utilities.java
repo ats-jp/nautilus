@@ -181,7 +181,7 @@ public class AS400Utilities {
 		}
 	}
 
-	private static String convertLine(
+	public static String convertLine(
 		byte[] line,
 		boolean addsSpacesAsShiftChars) {
 		String lineString;

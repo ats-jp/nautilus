@@ -59,7 +59,7 @@ public class DDSField extends ConditionHolder {
 		name = line.substring(18, 28).trim();
 
 		String lengthString = line.substring(29, 34).trim();
-		if (U.isAvailable(lengthString)) {
+		if (U.presents(lengthString)) {
 			if (!isInteger(lengthString)) throw new DDSParseException(
 				lineCount,
 				"フィールドの桁数が数値ではありません [" + lengthString + "]");
@@ -68,7 +68,7 @@ public class DDSField extends ConditionHolder {
 		}
 
 		String decimalLengthString = line.substring(35, 37).trim();
-		if (U.isAvailable(decimalLengthString)) {
+		if (U.presents(decimalLengthString)) {
 			if (!isInteger(decimalLengthString)) throw new DDSParseException(
 				lineCount,
 				"フィールドの少数点桁数が数値ではありません [" + decimalLengthString + "]");
@@ -96,8 +96,8 @@ public class DDSField extends ConditionHolder {
 	 * メッセージ等に使用する
 	 */
 	public String getConvenientName() {
-		if (U.isAvailable(name)) return name;
-		if (U.isAvailable(staticBody)) return "'" + staticBody + "'";
+		if (U.presents(name)) return name;
+		if (U.presents(staticBody)) return "'" + staticBody + "'";
 		return "*";
 	}
 
@@ -130,7 +130,7 @@ public class DDSField extends ConditionHolder {
 	}
 
 	int computeRowIndex(int currentRowIndex) {
-		if (U.isAvailable(rowIndexString)) {
+		if (U.presents(rowIndexString)) {
 			rowIndex = computeIndex(currentRowIndex, rowIndexString);
 			return rowIndex;
 		}
@@ -249,7 +249,7 @@ public class DDSField extends ConditionHolder {
 
 		int myIndex = Integer.parseInt(matcher.group(2));
 
-		if (U.isAvailable(matcher.group(1))) return currentIndex + myIndex;
+		if (U.presents(matcher.group(1))) return currentIndex + myIndex;
 
 		return myIndex;
 	}
