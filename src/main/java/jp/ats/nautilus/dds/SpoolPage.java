@@ -19,7 +19,7 @@ class SpoolPage {
 
 	private final String filler;
 
-	private int currentPosition = 0;
+	private final NewPageFinder newPageFinder = new NewPageFinder();
 
 	SpoolPage(int rows, int columns) {
 		this.columns = columns;
@@ -107,21 +107,11 @@ class SpoolPage {
 	}
 
 	boolean adoptLine(String line) {
-		String header = line.substring(0, 5);
-		int number = Integer.parseInt(line.substring(0, 5).trim());
+		if (newPageFinder.newPage(line)) return false;
 
-		if (header.charAt(3) != ' ') {
-			currentPosition += number;
-		} else {
-			//改ページ
-			if (number < currentPosition + 1) {
-				return false;
-			}
-
-			currentPosition = number - 1;
-		}
-
-		setLine(currentPosition, supply(line.substring(5), columns));
+		setLine(
+			newPageFinder.getCurrentPosition(),
+			supply(line.substring(5), columns));
 
 		return true;
 	}
