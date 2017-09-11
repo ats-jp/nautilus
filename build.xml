@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="nautilus" default="nautilus-jar">
+
+	<property name="classes" value="build" />
+	<property name="lib" value="." />
+
+	<path id="project.classpath">
+		<pathelement path="${classes}" />
+		<pathelement location="${lib}/itextpdf.jar" />
+		<pathelement location="${lib}/jt400.jar" />
+		<pathelement location="${lib}/substrate.jar" />
+	</path>
+
+	<target name="cleanup">
+		<delete dir="${classes}" />
+		<delete file="nautilus.jar" />
+	</target>
+
+	<target name="nautilus-jar" depends="cleanup">
+		<mkdir dir="${classes}" />
+		<javac srcdir="src" destdir="${classes}" debug="true" optimize="true" deprecation="true" encoding="UTF-8" includeantruntime="false">
+			<classpath refid="project.classpath" />
+			<include name="**/*.java" />
+		</javac>
+		<copy todir="${classes}">
+			<fileset dir="src" includes="**/*.java" />
+		</copy>
+		<jar basedir="build" jarfile="nautilus.jar" />
+	</target>
+</project>
