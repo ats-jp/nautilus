@@ -1,7 +1,7 @@
 package jp.ats.nautilus.dds;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import jp.ats.nautilus.common.MapMap;
 import jp.ats.nautilus.common.TextReader;
@@ -12,8 +12,8 @@ public class IndicatorsVendor {
 
 	public IndicatorsVendor() {}
 
-	public IndicatorsVendor(File input) throws IOException {
-		String[] lines = new TextReader(input.toURI().toURL())
+	public IndicatorsVendor(Path input) throws IOException {
+		String[] lines = new TextReader(input.toUri().toURL())
 			.readLinesAsArray();
 
 		for (String line : lines) {

@@ -1,7 +1,7 @@
 package jp.ats.nautilus.dds;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,8 +15,8 @@ public class BarcodeFieldVendor {
 
 	public BarcodeFieldVendor() {}
 
-	public BarcodeFieldVendor(File input) throws IOException {
-		String[] lines = new TextReader(input.toURI().toURL())
+	public BarcodeFieldVendor(Path input) throws IOException {
+		String[] lines = new TextReader(input.toUri().toURL())
 			.readLinesAsArray();
 
 		for (String line : lines) {

@@ -1,7 +1,7 @@
 package jp.ats.nautilus.dds;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,8 +15,8 @@ public class UnderlineOnlyFieldVendor {
 
 	public UnderlineOnlyFieldVendor() {}
 
-	public UnderlineOnlyFieldVendor(File input) throws IOException {
-		String[] lines = new TextReader(input.toURI().toURL())
+	public UnderlineOnlyFieldVendor(Path input) throws IOException {
+		String[] lines = new TextReader(input.toUri().toURL())
 			.readLinesAsArray();
 
 		for (String line : lines) {

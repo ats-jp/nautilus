@@ -4,10 +4,12 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
@@ -23,13 +25,13 @@ public class Controller {
 
 	private static final AtomicLong counter = new AtomicLong(0);
 
-	private final File debugRepository;
+	private final Path debugRepository;
 
 	public Controller() {
 		debugRepository = null;
 	}
 
-	public Controller(File debugRepository) {
+	public Controller(Path debugRepository) {
 		this.debugRepository = debugRepository;
 	}
 
@@ -69,32 +71,31 @@ public class Controller {
 		PageSize pageSize,
 		AS400Data spoolData,
 		String fontDirectory,
-		File outputDirectory,
-		File templateDirectory,
-		File templates,
-		File indicators,
-		File underlineOnlyFields,
-		File barcodeFields,
-		boolean strict) throws IOException {
+		Path outputDirectory,
+		Path templateDirectory,
+		Path templates,
+		Path indicators,
+		Path underlineOnlyFields,
+		Path barcodeFields,
+		boolean strict)
+		throws IOException {
 		ConcreteFontManager.setFontDirectory(fontDirectory);
 
-		File saveDirectory = null;
+		Path saveDirectory = null;
 
 		boolean debugMode = debugRepository != null
-			&& debugRepository.exists()
-			&& debugRepository.isDirectory();
+			&& Files.exists(debugRepository)
+			&& Files.isDirectory(debugRepository);
 
 		if (debugMode) {
-			saveDirectory = new File(
-				debugRepository,
+			saveDirectory = debugRepository.resolve(
 				U.formatDate("yyyyMMddHHmmss", new Date())
 					+ "."
 					+ ddsName
 					+ "."
 					+ counter.getAndAdd(1));
 
-			if (!saveDirectory.mkdirs())
-				throw new IllegalStateException(saveDirectory + " が作成できません");
+			Files.createDirectories(saveDirectory);
 
 			Properties properties = new Properties();
 			properties.setProperty("pdfName", pdfName);
@@ -113,17 +114,22 @@ public class Controller {
 			properties.setProperty("fontDirectory", fontDirectory);
 			properties.setProperty(
 				"outputDirectory",
-				outputDirectory.getAbsolutePath());
+				outputDirectory.toAbsolutePath().toString());
 			properties.setProperty(
 				"templateDirectory",
-				templateDirectory.getAbsolutePath());
-			properties.setProperty("templates", templates.getAbsolutePath());
-			properties.setProperty("indicators", indicators.getAbsolutePath());
+				templateDirectory.toAbsolutePath().toString());
+			properties.setProperty(
+				"templates",
+				templates.toAbsolutePath().toString());
+			properties.setProperty(
+				"indicators",
+				indicators.toAbsolutePath().toString());
 			properties.setProperty(
 				"underlineOnlyFields",
-				underlineOnlyFields.getAbsolutePath());
-			properties
-				.setProperty("barcodeFields", barcodeFields.getAbsolutePath());
+				underlineOnlyFields.toAbsolutePath().toString());
+			properties.setProperty(
+				"barcodeFields",
+				barcodeFields.toAbsolutePath().toString());
 			properties.setProperty("strict", String.valueOf(strict));
 
 			properties.setProperty(
@@ -133,20 +139,14 @@ public class Controller {
 				"spoolLineLength",
 				String.valueOf(spoolData.getLineLength()));
 
-			FileOutputStream output = new FileOutputStream(
-				new File(saveDirectory, "properties.xml"));
-
-			try {
+			try (OutputStream output = Files
+				.newOutputStream(saveDirectory.resolve("properties.xml"))) {
 				properties.storeToXML(output, null, "UTF-8");
-			} finally {
 				output.flush();
-				output.close();
 			}
 
-			write(ddsData.getData(), new File(saveDirectory, "dds.original"));
-			write(
-				spoolData.getData(),
-				new File(saveDirectory, "spool.original"));
+			write(ddsData.getData(), saveDirectory.resolve("dds.original"));
+			write(spoolData.getData(), saveDirectory.resolve("spool.original"));
 		}
 
 		IndicatorsVendor indicatorsVendor = new IndicatorsVendor(indicators);
@@ -161,11 +161,11 @@ public class Controller {
 		BarcodeFieldVendor barcodeFieldVendor = new BarcodeFieldVendor(
 			barcodeFields);
 
-		File pdf;
+		Path pdf;
 		try {
 			String[] ddsLines = AS400Utilities.convert(ddsData.read(), false);
 
-			if (debugMode) write(ddsLines, new File(saveDirectory, "dds.txt"));
+			if (debugMode) write(ddsLines, saveDirectory.resolve("dds.txt"));
 
 			DDSFile dds = DDSFile.getInstance(ddsName, ddsLines);
 
@@ -184,7 +184,7 @@ public class Controller {
 				.convert(ZeroLineConcatenator.execute(spoolData.read()), true);
 
 			if (debugMode)
-				write(spoolLines, new File(saveDirectory, "spool.txt"));
+				write(spoolLines, saveDirectory.resolve("spool.txt"));
 
 			SpoolFileReportLister lister = new SpoolFileReportLister(
 				spoolLines,
@@ -197,27 +197,26 @@ public class Controller {
 				strict);
 
 			if (debugMode)
-				lister.writePages(new File(saveDirectory, "expand.txt"));
+				lister.writePages(saveDirectory.resolve("expand.txt"));
 
 			lister.execute(dds, nautilus);
 
 			if (debugMode) {
-				OutputStream output = new FileOutputStream(
-					new File(saveDirectory, "nautilus.xml"));
+				OutputStream output = Files
+					.newOutputStream(saveDirectory.resolve("nautilus.xml"));
 				nautilus.save(output);
 				output.close();
 			}
 
-			pdf = new File(outputDirectory, pdfName + ".pdf");
+			pdf = outputDirectory.resolve(pdfName + ".pdf");
 			int counter = 0;
-			while (pdf.exists()) {
+			while (Files.exists(pdf)) {
 				//同名ファイルが既にある場合、名前を変更
-				pdf = new File(
-					outputDirectory,
-					pdfName + "-" + (++counter) + ".pdf");
+				pdf = outputDirectory
+					.resolve(pdfName + "-" + (++counter) + ".pdf");
 			}
 
-			OutputStream output = new FileOutputStream(pdf);
+			OutputStream output = Files.newOutputStream(pdf);
 
 			try {
 				nautilus.draw(output);
@@ -227,7 +226,7 @@ public class Controller {
 		} catch (Exception e) {
 			if (debugMode) {
 				PrintWriter writer = new PrintWriter(
-					new FileOutputStream(new File(saveDirectory, "error.log")));
+					Files.newOutputStream(saveDirectory.resolve("error.log")));
 				writer.println(ReportContext.getContextString());
 				e.printStackTrace(writer);
 				writer.flush();
@@ -279,31 +278,31 @@ public class Controller {
 			PageSize.valueOf(properties.getProperty("pageSize")),
 			spool,
 			U.care(properties.getProperty("fontPath")),
-			new File(U.care(properties.getProperty("outputDirectory"))),
-			new File(U.care(properties.getProperty("templateDirectory"))),
-			new File(U.care(properties.getProperty("templates"))),
-			new File(U.care(properties.getProperty("indicators"))),
-			new File(U.care(properties.getProperty("underlineOnlyFields"))),
-			new File(U.care(properties.getProperty("barcodeFields"))),
+			Paths.get(U.care(properties.getProperty("outputDirectory"))),
+			Paths.get(U.care(properties.getProperty("templateDirectory"))),
+			Paths.get(U.care(properties.getProperty("templates"))),
+			Paths.get(U.care(properties.getProperty("indicators"))),
+			Paths.get(U.care(properties.getProperty("underlineOnlyFields"))),
+			Paths.get(U.care(properties.getProperty("barcodeFields"))),
 			Boolean.parseBoolean(properties.getProperty("strict")));
 	}
 
 	public static class Result {
 
-		public final File pdf;
+		public final Path pdf;
 
-		public final File saveDirectory;
+		public final Path saveDirectory;
 
-		private Result(File pdf, File saveDirectory) {
+		private Result(Path pdf, Path saveDirectory) {
 			this.pdf = pdf;
 			this.saveDirectory = saveDirectory;
 		}
 	}
 
-	private static void write(byte[] input, File outputFile)
+	private static void write(byte[] input, Path outputFile)
 		throws IOException {
 		BufferedOutputStream output = new BufferedOutputStream(
-			new FileOutputStream(outputFile));
+			Files.newOutputStream(outputFile));
 
 		U.sendBytes(new ByteArrayInputStream(input), output);
 
@@ -311,9 +310,9 @@ public class Controller {
 		output.close();
 	}
 
-	private static void write(String[] lines, File outputFile)
+	private static void write(String[] lines, Path outputFile)
 		throws IOException {
-		PrintWriter writer = new PrintWriter(new FileOutputStream(outputFile));
+		PrintWriter writer = new PrintWriter(Files.newOutputStream(outputFile));
 
 		for (String line : lines) {
 			writer.println(line);

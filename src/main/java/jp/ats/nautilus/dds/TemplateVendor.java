@@ -1,7 +1,7 @@
 package jp.ats.nautilus.dds;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
 
 import jp.ats.nautilus.common.CollectionMap;
@@ -18,9 +18,9 @@ public class TemplateVendor {
 
 	public TemplateVendor() {}
 
-	public TemplateVendor(File input, File templateDirectory)
+	public TemplateVendor(Path input, Path templateDirectory)
 		throws IOException {
-		String[] lines = new TextReader(input.toURI().toURL())
+		String[] lines = new TextReader(input.toUri().toURL())
 			.readLinesAsArray();
 
 		for (String line : lines) {
@@ -29,7 +29,7 @@ public class TemplateVendor {
 			map.put(
 				columns[0],
 				TemplateManager.createTemplate(
-					new File(templateDirectory, columns[1]),
+					templateDirectory.resolve(columns[1]),
 					Integer.parseInt(columns[2])));
 		}
 	}

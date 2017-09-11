@@ -1,8 +1,8 @@
 package jp.ats.nautilus.pdf;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,14 +10,14 @@ import com.itextpdf.text.pdf.PdfReader;
 
 public class TemplateManager {
 
-	private static final Map<File, PdfReader> map =  new HashMap<>();
+	private static final Map<Path, PdfReader> map = new HashMap<>();
 
-	public static Template createTemplate(File pdfFile, int page)
+	public static Template createTemplate(Path pdfFile, int page)
 		throws IOException {
 		synchronized (map) {
 			PdfReader reader = map.get(pdfFile);
 			if (reader == null) {
-				reader = new PdfReader(new FileInputStream(pdfFile));
+				reader = new PdfReader(Files.newInputStream(pdfFile));
 				map.put(pdfFile, reader);
 			}
 
@@ -37,19 +37,19 @@ public class TemplateManager {
 
 	public static class Template {
 
-		private final File pdfFile;
+		private final Path pdfFile;
 
 		private final PdfReader reader;
 
 		private final int page;
 
-		private Template(File pdfFile, PdfReader reader, int page) {
+		private Template(Path pdfFile, PdfReader reader, int page) {
 			this.pdfFile = pdfFile;
 			this.reader = reader;
 			this.page = page;
 		}
 
-		public File getPDFFile() {
+		public Path getPDFFile() {
 			return pdfFile;
 		}
 

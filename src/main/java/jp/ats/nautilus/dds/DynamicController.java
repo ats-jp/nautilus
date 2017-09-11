@@ -1,7 +1,7 @@
 package jp.ats.nautilus.dds;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import com.ibm.as400.access.AS400;
 
@@ -13,32 +13,33 @@ import jp.ats.nautilus.pdf.ReportContext;
 
 public class DynamicController {
 
-	private final File debugRepository;
+	private final Path debugRepository;
 
 	public DynamicController() {
 		debugRepository = null;
 	}
 
-	public DynamicController(File debugRepository) {
+	public DynamicController(Path debugRepository) {
 		this.debugRepository = debugRepository;
 	}
 
-	public File execute(
+	public Path execute(
 		String pdfName,
 		String ddsName,
 		String spoolName,
 		AS400 as400,
 		String fontPath,
-		File dynamicConfigures,
-		File outputDirectory,
-		File templateDirectory,
-		File templates,
-		File indicators,
-		File underlineOnlyFields,
-		File barcodeFields,
-		boolean strict) throws IOException {
+		Path dynamicConfigures,
+		Path outputDirectory,
+		Path templateDirectory,
+		Path templates,
+		Path indicators,
+		Path underlineOnlyFields,
+		Path barcodeFields,
+		boolean strict)
+		throws IOException {
 		Configure configure = null;
-		for (String line : new TextReader(dynamicConfigures.toURI().toURL())
+		for (String line : new TextReader(dynamicConfigures.toUri().toURL())
 			.readLinesAsIterator()) {
 			if (!U.isAvailable(line)) continue;
 

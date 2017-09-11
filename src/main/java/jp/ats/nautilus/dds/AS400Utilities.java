@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import com.ibm.as400.access.AS400;
@@ -137,7 +138,8 @@ public class AS400Utilities {
 	public static String[] convert(
 		InputStream input,
 		int length,
-		boolean addsShiftChars) throws IOException {
+		boolean addsShiftChars)
+		throws IOException {
 		return convert(
 			new AS400Data(U.readBytes(input), length).read(),
 			addsShiftChars);
@@ -146,13 +148,32 @@ public class AS400Utilities {
 	public static void write(
 		AS400Resource resource,
 		PrintWriter writer,
-		boolean addsShiftChars) throws IOException, AS400SecurityException {
+		boolean addsShiftChars)
+		throws IOException, AS400SecurityException {
 		byte[] buffer = new byte[resource.length];
 		try (InputStream input = new BufferedInputStream(resource.open())) {
 			int readed;
 			while ((readed = input.read(buffer)) == resource.length) {
 				String lineString = convertLine(buffer, addsShiftChars);
 				writer.println(CP932.treatForCP932(lineString));
+			}
+
+			if (readed != -1)
+				throw new IllegalStateException(Integer.toString(readed));
+		}
+	}
+
+	public static void write(
+		AS400Resource resource,
+		Consumer<String> lineConsumer,
+		boolean addsShiftChars)
+		throws IOException, AS400SecurityException {
+		byte[] buffer = new byte[resource.length];
+		try (InputStream input = new BufferedInputStream(resource.open())) {
+			int readed;
+			while ((readed = input.read(buffer)) == resource.length) {
+				String lineString = convertLine(buffer, addsShiftChars);
+				lineConsumer.accept(CP932.treatForCP932(lineString));
 			}
 
 			if (readed != -1)

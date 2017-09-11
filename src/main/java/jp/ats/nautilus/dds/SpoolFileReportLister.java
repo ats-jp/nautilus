@@ -1,9 +1,9 @@
 package jp.ats.nautilus.dds;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -128,8 +128,8 @@ public class SpoolFileReportLister extends ReportLister {
 		return drawers.toArray(new FieldDrawer[drawers.size()]);
 	}
 
-	public void writePages(File outputFile) throws IOException {
-		PrintWriter writer = new PrintWriter(new FileOutputStream(outputFile));
+	public void writePages(Path outputFile) throws IOException {
+		PrintWriter writer = new PrintWriter(Files.newOutputStream(outputFile));
 		int pageNumber = 0;
 		for (SpoolPage page : pages) {
 			writer.println("----- page " + ++pageNumber + " -----");

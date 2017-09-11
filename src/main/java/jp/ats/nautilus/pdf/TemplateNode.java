@@ -1,7 +1,7 @@
 package jp.ats.nautilus.pdf;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -19,7 +19,7 @@ class TemplateNode extends Node {
 
 	TemplateNode(XPathNode node) throws IOException {
 		this.template = TemplateManager.createTemplate(
-			new File(node.selectNode("@file").getNodeValue()),
+			Paths.get(node.selectNode("@file").getNodeValue()),
 			Integer.parseInt(node.selectNode("@page").getNodeValue()));
 	}
 
@@ -31,7 +31,9 @@ class TemplateNode extends Node {
 	@Override
 	void appendSelf(Document document, Element parent) {
 		Element self = document.createElement("template");
-		self.setAttribute("file", template.getPDFFile().getAbsolutePath());
+		self.setAttribute(
+			"file",
+			template.getPDFFile().toAbsolutePath().toString());
 		self.setAttribute("page", String.valueOf(template.getPage()));
 		parent.appendChild(self);
 	}
