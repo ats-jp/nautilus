@@ -408,6 +408,10 @@ public class Report {
 		canvas.newPage();
 	}
 
+	public int getPageNumber() {
+		return canvas.getPageNumber();
+	}
+
 	public void close() {
 		LineProcess.OTHER.prepare(current, this);
 		canvas.close();

@@ -201,6 +201,10 @@ public class Canvas {
 		document.newPage();
 	}
 
+	public int getPageNumber() {
+		return document.getPageNumber();
+	}
+
 	public void close() {
 		document.close();
 	}

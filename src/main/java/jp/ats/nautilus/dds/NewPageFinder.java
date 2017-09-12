@@ -6,7 +6,7 @@ public class NewPageFinder {
 
 	public boolean newPage(String line) {
 		String header = line.substring(0, 5);
-		int number = Integer.parseInt(line.substring(0, 5).trim());
+		int number = Integer.parseInt(header.trim());
 
 		if (header.charAt(3) != ' ') {
 			currentPosition += number;
