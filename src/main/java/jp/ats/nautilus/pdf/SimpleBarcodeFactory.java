@@ -1,7 +1,7 @@
 package jp.ats.nautilus.pdf;
 
-import com.itextpdf.text.Element;
-import com.itextpdf.text.pdf.Barcode;
+import com.lowagie.text.Element;
+import com.lowagie.text.pdf.Barcode;
 
 public class SimpleBarcodeFactory implements BarcodeFactory {
 

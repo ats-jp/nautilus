@@ -1,24 +1,20 @@
 package jp.ats.nautilus.pdf;
 
+import java.awt.Color;
 import java.io.OutputStream;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.Barcode;
-import com.itextpdf.text.pdf.Barcode128;
-import com.itextpdf.text.pdf.Barcode39;
-import com.itextpdf.text.pdf.BarcodeEAN;
-import com.itextpdf.text.pdf.BarcodeQRCode;
-import com.itextpdf.text.pdf.BaseFont;
-import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.pdf.qrcode.EncodeHintType;
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Image;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.Barcode;
+import com.lowagie.text.pdf.Barcode128;
+import com.lowagie.text.pdf.Barcode39;
+import com.lowagie.text.pdf.BarcodeEAN;
+import com.lowagie.text.pdf.BaseFont;
+import com.lowagie.text.pdf.PdfContentByte;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfWriter;
 
 public class Canvas {
 
@@ -152,34 +148,7 @@ public class Canvas {
 		Barcode code = factory.create(barcode);
 
 		Image image = code
-			.createImageWithBarcode(pdf, BaseColor.BLACK, BaseColor.BLACK);
-
-		float height = image.getHeight();
-
-		pdf.addImage(
-			image,
-			image.getWidth(),
-			0,
-			0,
-			height,
-			startX + x,
-			startY - y - height);
-	}
-
-	void qrcode(float x, float y, int width, String encoding, String qrcode)
-		throws DocumentException {
-
-		Map<EncodeHintType, Object> hint = new ConcurrentHashMap<>();
-		if (encoding != null) {
-			hint.put(EncodeHintType.CHARACTER_SET, encoding);
-		}
-
-		BarcodeQRCode code = new BarcodeQRCode(
-			qrcode.trim(),
-			width,
-			width,
-			hint);
-		Image image = code.getImage();
+			.createImageWithBarcode(pdf, Color.BLACK, Color.BLACK);
 
 		float height = image.getHeight();
 

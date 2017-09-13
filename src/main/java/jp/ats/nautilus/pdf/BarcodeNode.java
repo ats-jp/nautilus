@@ -5,7 +5,7 @@ import java.util.Objects;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.itextpdf.text.DocumentException;
+import com.lowagie.text.DocumentException;
 
 import jp.ats.nautilus.common.U;
 import jp.ats.nautilus.common.XPathNode;

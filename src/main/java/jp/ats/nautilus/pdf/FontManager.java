@@ -1,6 +1,6 @@
 package jp.ats.nautilus.pdf;
 
-import com.itextpdf.text.pdf.BaseFont;
+import com.lowagie.text.pdf.BaseFont;
 
 public interface FontManager {
 

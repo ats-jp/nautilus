@@ -1,6 +1,6 @@
 package jp.ats.nautilus.pdf;
 
-import com.itextpdf.text.pdf.Barcode;
+import com.lowagie.text.pdf.Barcode;
 
 public interface BarcodeFactory {
 

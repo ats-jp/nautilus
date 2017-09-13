@@ -1,6 +1,6 @@
 package jp.ats.nautilus.pdf;
 
-import com.itextpdf.text.Rectangle;
+import com.lowagie.text.Rectangle;
 
 public enum PageSize {
 
@@ -11,7 +11,7 @@ public enum PageSize {
 
 		@Override
 		public Rectangle getRectangle() {
-			return com.itextpdf.text.PageSize.A4;
+			return com.lowagie.text.PageSize.A4;
 		}
 	},
 
@@ -22,7 +22,7 @@ public enum PageSize {
 
 		@Override
 		public Rectangle getRectangle() {
-			return com.itextpdf.text.PageSize.A4_LANDSCAPE;
+			return com.lowagie.text.PageSize.A4.rotate();
 		}
 	},
 
@@ -33,7 +33,7 @@ public enum PageSize {
 
 		@Override
 		public Rectangle getRectangle() {
-			return com.itextpdf.text.PageSize.A3;
+			return com.lowagie.text.PageSize.A3;
 		}
 	},
 
@@ -44,7 +44,7 @@ public enum PageSize {
 
 		@Override
 		public Rectangle getRectangle() {
-			return com.itextpdf.text.PageSize.A3.rotate();
+			return com.lowagie.text.PageSize.A3.rotate();
 		}
 	};
 

@@ -67,15 +67,6 @@ public class Page implements Comparable<Page> {
 		nodes.add(new BarcodeNode(row, column, barcodeFactoryClass, barcode));
 	}
 
-	public void addQrcode(
-		int row,
-		int column,
-		int width,
-		String encode,
-		String barcode) {
-		nodes.add(new QrcodeNode(row, column, width, encode, barcode));
-	}
-
 	void addNode(Node node) {
 		nodes.add(node);
 	}

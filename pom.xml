@@ -23,33 +23,11 @@
 						<id>install-itextpdf</id>
 						<phase>clean</phase>
 						<configuration>
-							<file>itextpdf.jar</file>
+							<file>itext-4.2.1.jar</file>
 							<repositoryLayout>default</repositoryLayout>
-							<groupId>com.itextpdf</groupId>
-							<artifactId>itextpdf</artifactId>
-							<version>1.0.0</version>
-							<packaging>jar</packaging>
-							<generatePom>true</generatePom>
-						</configuration>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-install-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>install-jt400</id>
-						<phase>clean</phase>
-						<configuration>
-							<file>jt400.jar</file>
-							<repositoryLayout>default</repositoryLayout>
-							<groupId>com.ibm</groupId>
-							<artifactId>jt400</artifactId>
-							<version>1.0.0</version>
+							<groupId>com.lowagie</groupId>
+							<artifactId>itext</artifactId>
+							<version>4.2.1</version>
 							<packaging>jar</packaging>
 							<generatePom>true</generatePom>
 						</configuration>
@@ -64,14 +42,14 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.itextpdf</groupId>
-			<artifactId>itextpdf</artifactId>
-			<version>1.0.0</version>
+			<groupId>net.sf.jt400</groupId>
+			<artifactId>jt400</artifactId>
+			<version>9.3</version>
 		</dependency>
 		<dependency>
-			<groupId>com.ibm</groupId>
-			<artifactId>jt400</artifactId>
-			<version>1.0.0</version>
+			<groupId>com.lowagie</groupId>
+			<artifactId>itext</artifactId>
+			<version>4.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

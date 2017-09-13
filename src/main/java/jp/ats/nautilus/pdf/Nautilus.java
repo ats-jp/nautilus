@@ -195,8 +195,6 @@ public class Nautilus {
 						page.addNode(new UnderlineNode(node));
 					} else if (BarcodeNode.isTarget(node)) {
 						page.addNode(new BarcodeNode(node));
-					} else if (QrcodeNode.isTarget(node)) {
-						page.addNode(new QrcodeNode(node));
 					} else {
 						throw new IllegalStateException(
 							"不明なタグ " + node.getNodeName());

@@ -2,8 +2,8 @@ package jp.ats.nautilus.pdf;
 
 import java.io.IOException;
 
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.pdf.BaseFont;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.pdf.BaseFont;
 
 import jp.ats.nautilus.pdf.TemplateManager.Template;
 
@@ -361,23 +361,6 @@ public class Report {
 			(startColumn - 1) * cellWidth,
 			(startLine - 1) * cellHeight,
 			barcode);
-	}
-
-	public void drawQrcode(
-		int startLine,
-		int startColumn,
-		int width,
-		String encoding,
-		String qrcode)
-		throws DocumentException {
-		LineProcess.OTHER.prepare(current, this);
-
-		canvas.qrcode(
-			(startColumn - 1) * cellWidth,
-			(startLine - 1) * cellHeight,
-			width,
-			encoding,
-			qrcode);
 	}
 
 	public void drawBarcode39(int startLine, int startColumn, String barcode)

@@ -3,8 +3,8 @@ package jp.ats.nautilus.dds;
 import java.io.File;
 import java.io.IOException;
 
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.pdf.BaseFont;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.pdf.BaseFont;
 
 import jp.ats.nautilus.pdf.FontManager;
 

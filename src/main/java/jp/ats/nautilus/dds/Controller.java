@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.itextpdf.text.DocumentException;
+import com.lowagie.text.DocumentException;
 
 import jp.ats.nautilus.common.U;
 import jp.ats.nautilus.pdf.Nautilus;
