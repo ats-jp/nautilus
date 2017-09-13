@@ -1,5 +1,6 @@
 package jp.ats.nautilus.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -22,10 +23,11 @@ public class SpoolRestorator {
 
 	private int currentPosition = 0;
 
-	public void restore(AS400Handler handler, Consumer<RestoredPage> pageConsumer)
+	public void restore(
+		AS400Handler handler,
+		Consumer<RestoredPage> pageConsumer)
 		throws InterruptedException {
 		AS400Resource resource = handler.getResource();
-
 		try {
 			resource.read(bytes -> {
 				String line = CP932
@@ -40,7 +42,21 @@ public class SpoolRestorator {
 		finish(pageConsumer);
 	}
 
-	public void restore(Iterable<String> spool, Consumer<RestoredPage> pageConsumer) {
+	public void restore(
+		BufferedReader reader,
+		Consumer<RestoredPage> pageConsumer)
+		throws IOException {
+		String line;
+		while ((line = reader.readLine()) != null) {
+			accept(line, pageConsumer);
+		}
+
+		finish(pageConsumer);
+	}
+
+	public void restore(
+		Iterable<String> spool,
+		Consumer<RestoredPage> pageConsumer) {
 		spool.forEach(line -> accept(line, pageConsumer));
 		finish(pageConsumer);
 	}
