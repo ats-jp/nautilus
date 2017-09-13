@@ -4,19 +4,19 @@ import java.util.List;
 
 import jp.ats.nautilus.common.U;
 
-class Page {
+public class RestoredPage {
 
 	private final List<String> lines;
 
-	Page(List<String> lines) {
+	RestoredPage(List<String> lines) {
 		this.lines = lines;
 	}
 
-	String get(int index) {
+	public String get(int index) {
 		return lines.get(index);
 	}
 
-	List<String> getLines() {
+	public List<String> getLines() {
 		return lines;
 	}
 

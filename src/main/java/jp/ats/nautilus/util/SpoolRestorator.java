@@ -22,7 +22,7 @@ public class SpoolRestorator {
 
 	private int currentPosition = 0;
 
-	public void restore(AS400Handler handler, Consumer<Page> pageConsumer)
+	public void restore(AS400Handler handler, Consumer<RestoredPage> pageConsumer)
 		throws InterruptedException {
 		AS400Resource resource = handler.getResource();
 
@@ -40,12 +40,12 @@ public class SpoolRestorator {
 		finish(pageConsumer);
 	}
 
-	public void restore(Iterable<String> spool, Consumer<Page> pageConsumer) {
+	public void restore(Iterable<String> spool, Consumer<RestoredPage> pageConsumer) {
 		spool.forEach(line -> accept(line, pageConsumer));
 		finish(pageConsumer);
 	}
 
-	private void accept(String spoolLine, Consumer<Page> pageConsumer) {
+	private void accept(String spoolLine, Consumer<RestoredPage> pageConsumer) {
 		String header = spoolLine.substring(0, 5);
 		String body = spoolLine.substring(5);
 
@@ -60,7 +60,7 @@ public class SpoolRestorator {
 
 			if (isNewPage) {
 				//改ページ
-				Page page = extractPage();
+				RestoredPage page = extractPage();
 				setLine(body);
 				pageConsumer.accept(page);
 			}
@@ -69,12 +69,12 @@ public class SpoolRestorator {
 		setLine(body);
 	}
 
-	private void finish(Consumer<Page> pageConsumer) {
+	private void finish(Consumer<RestoredPage> pageConsumer) {
 		pageConsumer.accept(extractPage());
 	}
 
-	private Page extractPage() {
-		Page result = new Page(new ArrayList<>(lines));
+	private RestoredPage extractPage() {
+		RestoredPage result = new RestoredPage(new ArrayList<>(lines));
 		lines.clear();
 		return result;
 	}
