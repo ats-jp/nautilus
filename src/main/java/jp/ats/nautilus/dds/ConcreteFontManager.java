@@ -20,14 +20,13 @@ public class ConcreteFontManager implements FontManager {
 		String fontString;
 		String fontName = "msmincho.ttc";
 		String systemFontPath = "c:/windows/fonts/";
-		String monospaceSelector = ",0";
 
 		String fontDirectory = getFontDirectory();
 
 		if (!new File(systemFontPath + fontName).exists()) {
-			fontString = fontDirectory + fontName + monospaceSelector;
+			fontString = fontDirectory + fontName;
 		} else {
-			fontString = systemFontPath + fontName + monospaceSelector;
+			fontString = systemFontPath + fontName;
 		}
 
 		font = new Font() {
@@ -39,7 +38,7 @@ public class ConcreteFontManager implements FontManager {
 
 			@Override
 			protected String name() {
-				return "msmincho";
+				return "MS-Mincho";
 			}
 		};
 

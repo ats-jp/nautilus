@@ -78,8 +78,7 @@ public class Canvas implements AutoCloseable {
 		float marginLeftMM, // A4での長さ
 		float marginTopMM, // A4での長さ
 		Rectangle rectangle,
-		OutputStream output)
-		throws IOException {
+		OutputStream output) {
 		this.rows = rows;
 		this.columns = columns;
 		this.lpi = lpi;
@@ -198,7 +197,8 @@ public class Canvas implements AutoCloseable {
 	}
 
 	float getFontDescent(Font font, float fontPoint) {
-		return fontCache.get(font.name()).getFontDescriptor().getDescent();
+		return fontCache.get(font.name()).getFontDescriptor().getDescent()
+			/ 100;
 	}
 
 	boolean charExists(Font font, char c) {
@@ -234,7 +234,10 @@ public class Canvas implements AutoCloseable {
 
 	void newPage() {
 		try {
-			if (currentStream != null) currentStream.close();
+			if (currentStream != null) {
+				currentStream.close();
+				currentStream = null;
+			}
 
 			PDPage page;
 			if (currentTemplatePage == null) {
@@ -257,9 +260,14 @@ public class Canvas implements AutoCloseable {
 
 	public void save() {
 		try {
-			if (currentStream != null) currentStream.close();
+			if (currentStream != null) {
+				currentStream.close();
+				currentStream = null;
+			}
+
 			document.save(output);
 		} catch (IOException e) {
+			e.printStackTrace();
 			throw new DocumentException(e);
 		}
 	}
@@ -287,11 +295,6 @@ public class Canvas implements AutoCloseable {
 
 	float getCPI() {
 		return cpi;
-	}
-
-	@Override
-	protected void finalize() {
-		close();
 	}
 
 	private PDPage cloneTemplatePage() {

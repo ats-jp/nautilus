@@ -1,9 +1,5 @@
 package jp.ats.nautilus.pdf;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 public class Report implements AutoCloseable {
 
 	private static final float lineWidth = 0.1f;
@@ -121,34 +117,8 @@ public class Report implements AutoCloseable {
 
 	private LineProcess current = LineProcess.OTHER;
 
-	private static class DefaultFontManager implements FontManager {
-
-		private DefaultFontManager() {}
-
-		@Override
-		public Font createFont() {
-			return new Font() {
-
-				@Override
-				protected InputStream load() throws IOException {
-					return new FileInputStream("c:/windows/fonts/msmincho.ttc");
-				}
-
-				@Override
-				protected String name() {
-					return "MS-Mincho";
-				}
-			};
-		}
-
-		@Override
-		public Font createExternalFont() {
-			return null;
-		}
-	}
-
-	public Report(Canvas canvas) throws IOException, DocumentException {
-		this(canvas, new DefaultFontManager());
+	public Report(Canvas canvas) {
+		this(canvas, new SimpleFontManager());
 	}
 
 	public Report(Canvas canvas, FontManager fontManager) {
@@ -173,8 +143,8 @@ public class Report implements AutoCloseable {
 			rateX = 1;
 		}
 
-		font = fontManager.createFont();
-		externalFont = fontManager.createExternalFont();
+		font = fontManager.getFont();
+		externalFont = fontManager.getExternalFont();
 	}
 
 	private Template currentTemplate;
@@ -411,11 +381,6 @@ public class Report implements AutoCloseable {
 		}
 
 		return false;
-	}
-
-	@Override
-	protected void finalize() {
-		close();
 	}
 
 	private void startLineDraw(float lineWidth) {

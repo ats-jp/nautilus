@@ -1,8 +1,22 @@
 package jp.ats.nautilus.pdf;
 
-public interface FontManager {
+public abstract class FontManager {
 
-	public Font createFont();
+	private Font font;
 
-	public Font createExternalFont();
+	private Font externalFont;
+
+	public synchronized Font getFont() {
+		if (font == null) font = createFont();
+		return font;
+	}
+
+	public synchronized Font getExternalFont() {
+		if (externalFont == null) externalFont = createExternalFont();
+		return externalFont;
+	}
+
+	protected abstract Font createFont();
+
+	protected abstract Font createExternalFont();
 }
