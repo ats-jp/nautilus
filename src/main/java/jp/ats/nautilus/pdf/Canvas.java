@@ -1,46 +1,44 @@
 package jp.ats.nautilus.pdf;
 
-import java.awt.Color;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Image;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.Barcode;
-import com.lowagie.text.pdf.Barcode128;
-import com.lowagie.text.pdf.Barcode39;
-import com.lowagie.text.pdf.BarcodeEAN;
-import com.lowagie.text.pdf.BaseFont;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfWriter;
+import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.util.Matrix;
 
-public class Canvas {
+public class Canvas implements AutoCloseable {
 
-	public static final BarcodeFactory BARCODE_39_DEFAULT = new SimpleBarcodeFactory(
-		Barcode39.class,
-		0.8f,
-		2.0f,
-		8f,
-		8f,
-		20f);
-
-	public static final BarcodeFactory BARCODE_128_DEFAULT = new SimpleBarcodeFactory(
-		Barcode128.class,
-		0.8f,
-		0.0f,
-		8f,
-		8f,
-		20f);
-
-	public static final BarcodeFactory BARCODE_EAN_DEFAULT = new SimpleBarcodeFactory(
-		BarcodeEAN.class,
-		0.8f,
-		0.0f,
-		8f,
-		8f,
-		20f);
+	//TODO barcode
+	//	public static final BarcodeFactory BARCODE_39_DEFAULT = new SimpleBarcodeFactory(
+	//		Barcode39.class,
+	//		0.8f,
+	//		2.0f,
+	//		8f,
+	//		8f,
+	//		20f);
+	//
+	//	public static final BarcodeFactory BARCODE_128_DEFAULT = new SimpleBarcodeFactory(
+	//		Barcode128.class,
+	//		0.8f,
+	//		0.0f,
+	//		8f,
+	//		8f,
+	//		20f);
+	//
+	//	public static final BarcodeFactory BARCODE_EAN_DEFAULT = new SimpleBarcodeFactory(
+	//		BarcodeEAN.class,
+	//		0.8f,
+	//		0.0f,
+	//		8f,
+	//		8f,
+	//		20f);
 
 	private static final float inchPoint = 72; // Points per Inch
 
@@ -56,9 +54,21 @@ public class Canvas {
 
 	private final float startY;
 
-	private final Document document;
+	private final Rectangle rectangle;
 
-	private final PdfContentByte pdf;
+	private final PDDocument document;
+
+	private final Map<String, PDType0Font> fontCache = new HashMap<>();
+
+	private final OutputStream output;
+
+	private PDPageContentStream currentStream;
+
+	private PDDocument currentTemplateDocument;
+
+	private PDPage currentTemplatePage;
+
+	private final Map<Integer, PDPage> templatePageCache = new HashMap<>();
 
 	public Canvas(
 		int rows,
@@ -67,62 +77,74 @@ public class Canvas {
 		float cpi,
 		float marginLeftMM, // A4での長さ
 		float marginTopMM, // A4での長さ
-		Rectangle pageSize,
+		Rectangle rectangle,
 		OutputStream output)
-		throws DocumentException {
+		throws IOException {
 		this.rows = rows;
 		this.columns = columns;
 		this.lpi = lpi;
 		this.cpi = cpi;
 
+		this.rectangle = rectangle;
+
+		this.output = output;
+
+		document = new PDDocument();
+
 		float marginLeftPoint = inchPoint / 25.4f * marginLeftMM;
 		float marginTopPoint = inchPoint / 25.4f * marginTopMM;
 
 		startX = marginLeftPoint;
-		startY = pageSize.getHeight() - marginTopPoint;
-
-		document = new Document(pageSize);
-
-		PdfWriter writer = PdfWriter.getInstance(document, output);
-
-		document.open();
-
-		writer.setFullCompression();
-
-		pdf = writer.getDirectContent();
-	}
-
-	void addTemplate(PdfReader reader, int page) {
-		pdf.addTemplate(pdf.getPdfWriter().getImportedPage(reader, page), 0, 0);
-	}
-
-	void saveState() {
-		pdf.saveState();
-	}
-
-	void restoreState() {
-		pdf.restoreState();
+		startY = rectangle.getHeight() - marginTopPoint;
 	}
 
 	void setLineWidth(float width) {
-		pdf.setLineWidth(width);
+		try {
+			currentStream.setLineWidth(width);
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
 	}
 
 	void setGrayStroke(float gray) {
-		pdf.setGrayStroke(gray);
+		try {
+			currentStream.setStrokingColor(gray);
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
 	}
 
 	void line(float fromX, float fromY, float toX, float toY) {
-		pdf.moveTo(startX + fromX, startY - fromY);
-		pdf.lineTo(startX + toX, startY - toY);
+		try {
+			currentStream.moveTo(startX + fromX, startY - fromY);
+			currentStream.lineTo(startX + toX, startY - toY);
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
 	}
 
 	void stroke() {
-		pdf.stroke();
+		try {
+			currentStream.stroke();
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
 	}
 
-	void setFontAndSize(BaseFont font, float size) {
-		pdf.setFontAndSize(font, size);
+	void setFontAndSize(Font font, float size) {
+		String name = font.name();
+		PDType0Font pdFont = fontCache.get(name);
+
+		if (pdFont == null) {
+			pdFont = font.createPDFont(document);
+			fontCache.put(name, pdFont);
+		}
+
+		try {
+			currentStream.setFont(pdFont, size);
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
 	}
 
 	void showText(
@@ -131,51 +153,124 @@ public class Canvas {
 		float x,
 		float y,
 		String text) {
-		pdf.beginText();
-		pdf.setTextMatrix(
-			horizontalSize,
-			0,
-			0,
-			verticalSize,
-			startX + x,
-			startY - y);
-		pdf.showText(text);
-		pdf.endText();
+		try {
+			currentStream.beginText();
+			currentStream.setTextMatrix(
+				new Matrix(
+					horizontalSize,
+					0,
+					0,
+					verticalSize,
+					startX + x,
+					startY - y));
+			currentStream.showText(text);
+			currentStream.endText();
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
 	}
 
-	void barcode(BarcodeFactory factory, float x, float y, String barcode)
-		throws DocumentException {
-		Barcode code = factory.create(barcode);
-
-		Image image = code
-			.createImageWithBarcode(pdf, Color.BLACK, Color.BLACK);
-
-		float height = image.getHeight();
-
-		pdf.addImage(
-			image,
-			image.getWidth(),
-			0,
-			0,
-			height,
-			startX + x,
-			startY - y - height);
-	}
+	//TODO barcode
+	//	void barcode(BarcodeFactory factory, float x, float y, String barcode) {
+	//		Barcode code = factory.create(barcode);
+	//
+	//		Image image = code
+	//			.createImageWithBarcode(pdf, Color.BLACK, Color.BLACK);
+	//
+	//		float height = image.getHeight();
+	//
+	//		currentStream.addImage(
+	//			image,
+	//			image.getWidth(),
+	//			0,
+	//			0,
+	//			height,
+	//			startX + x,
+	//			startY - y - height);
+	//	}
 
 	void setCharacterSpacing(float space) {
-		pdf.setCharacterSpacing(space);
+		try {
+			currentStream.setCharacterSpacing(space);
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
 	}
 
-	public void newPage() {
-		document.newPage();
+	float getFontDescent(Font font, float fontPoint) {
+		return fontCache.get(font.name()).getFontDescriptor().getDescent();
 	}
 
-	public int getPageNumber() {
-		return document.getPageNumber();
+	boolean charExists(Font font, char c) {
+		try {
+			return fontCache.get(font.name()).hasGlyph(c);
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
 	}
 
+	void setTemplateDocument(byte[] pdf) {
+		templatePageCache.clear();
+		currentTemplatePage = null;
+
+		try {
+			currentTemplateDocument = PDDocument.load(pdf);
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
+	}
+
+	void selectTemplatePage(int pageIndex) {
+		currentTemplatePage = templatePageCache.get(pageIndex);
+
+		if (currentTemplatePage == null) {
+			currentTemplatePage = currentTemplateDocument.getDocumentCatalog()
+				.getPages()
+				.get(pageIndex);
+
+			templatePageCache.put(pageIndex, currentTemplatePage);
+		}
+	}
+
+	void newPage() {
+		try {
+			if (currentStream != null) currentStream.close();
+
+			PDPage page;
+			if (currentTemplatePage == null) {
+				page = rectangle.newPage();
+			} else {
+				page = cloneTemplatePage();
+			}
+
+			document.addPage(page);
+
+			currentStream = rectangle.newPageContentStream(document, page);
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
+	}
+
+	public int getNumberOfPages() {
+		return document.getNumberOfPages();
+	}
+
+	public void save() {
+		try {
+			if (currentStream != null) currentStream.close();
+			document.save(output);
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
+	}
+
+	@Override
 	public void close() {
-		document.close();
+		try {
+			document.close();
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
 	}
 
 	int getRows() {
@@ -197,5 +292,12 @@ public class Canvas {
 	@Override
 	protected void finalize() {
 		close();
+	}
+
+	private PDPage cloneTemplatePage() {
+		COSDictionary pageDict = currentTemplatePage.getCOSObject();
+		COSDictionary newPageDict = new COSDictionary(pageDict);
+		newPageDict.removeItem(COSName.ANNOTS);
+		return new PDPage(newPageDict);
 	}
 }

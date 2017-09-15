@@ -6,8 +6,8 @@ import java.util.Collection;
 
 import jp.ats.nautilus.common.CollectionMap;
 import jp.ats.nautilus.common.TextReader;
+import jp.ats.nautilus.pdf.Template;
 import jp.ats.nautilus.pdf.TemplateManager;
-import jp.ats.nautilus.pdf.TemplateManager.Template;
 
 public class TemplateVendor {
 

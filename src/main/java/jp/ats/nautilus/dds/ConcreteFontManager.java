@@ -1,22 +1,22 @@
 package jp.ats.nautilus.dds;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.BaseFont;
-
+import jp.ats.nautilus.pdf.Font;
 import jp.ats.nautilus.pdf.FontManager;
 
 public class ConcreteFontManager implements FontManager {
 
 	private static String fontDirectory = "";
 
-	private final BaseFont font;
+	private final Font font;
 
-	private final BaseFont externalFont;
+	private final Font externalFont;
 
-	public ConcreteFontManager() throws IOException, DocumentException {
+	public ConcreteFontManager() throws IOException {
 		String fontString;
 		String fontName = "msmincho.ttc";
 		String systemFontPath = "c:/windows/fonts/";
@@ -30,22 +30,40 @@ public class ConcreteFontManager implements FontManager {
 			fontString = systemFontPath + fontName + monospaceSelector;
 		}
 
-		font = BaseFont
-			.createFont(fontString, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+		font = new Font() {
 
-		externalFont = BaseFont.createFont(
-			fontDirectory + "EUDC.TTF",
-			BaseFont.IDENTITY_H,
-			BaseFont.EMBEDDED);
+			@Override
+			protected InputStream load() throws IOException {
+				return new FileInputStream(fontString);
+			}
+
+			@Override
+			protected String name() {
+				return "msmincho";
+			}
+		};
+
+		externalFont = new Font() {
+
+			@Override
+			protected InputStream load() throws IOException {
+				return new FileInputStream(fontDirectory + "EUDC.TTF");
+			}
+
+			@Override
+			protected String name() {
+				return "EUDC";
+			}
+		};
 	}
 
 	@Override
-	public BaseFont createFont() {
+	public Font createFont() {
 		return font;
 	}
 
 	@Override
-	public BaseFont createExternalFont() {
+	public Font createExternalFont() {
 		return externalFont;
 	}
 

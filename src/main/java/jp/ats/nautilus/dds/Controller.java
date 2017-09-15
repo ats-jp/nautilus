@@ -14,11 +14,10 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.lowagie.text.DocumentException;
-
 import jp.ats.nautilus.common.U;
+import jp.ats.nautilus.pdf.DocumentException;
 import jp.ats.nautilus.pdf.Nautilus;
-import jp.ats.nautilus.pdf.PageSize;
+import jp.ats.nautilus.pdf.Rectangle;
 import jp.ats.nautilus.pdf.ReportContext;
 
 public class Controller {
@@ -68,7 +67,7 @@ public class Controller {
 		int marginLeftMM,
 		int marginTopMM,
 		int recordIndicatorPosition,
-		PageSize pageSize,
+		Rectangle rectangle,
 		AS400Data spoolData,
 		String fontDirectory,
 		Path outputDirectory,
@@ -110,7 +109,7 @@ public class Controller {
 			properties.setProperty(
 				"recordIndicatorPosition",
 				String.valueOf(recordIndicatorPosition));
-			properties.setProperty("pageSize", pageSize.name());
+			properties.setProperty("rectangle", rectangle.name());
 			properties.setProperty("fontDirectory", fontDirectory);
 			properties.setProperty(
 				"outputDirectory",
@@ -177,7 +176,7 @@ public class Controller {
 			nautilus.setCPI(cpi);
 			nautilus.setMarginLeft(marginLeftMM);
 			nautilus.setMarginTop(marginTopMM);
-			nautilus.setPageSize(pageSize);
+			nautilus.setRectangle(rectangle);
 			nautilus.setFontManagerClass(ConcreteFontManager.class);
 
 			String[] spoolLines = AS400Utilities
@@ -275,7 +274,7 @@ public class Controller {
 			Integer.parseInt(properties.getProperty("marginLeftMM")),
 			Integer.parseInt(properties.getProperty("marginTopMM")),
 			Integer.parseInt(properties.getProperty("recordIndicatorPosition")),
-			PageSize.valueOf(properties.getProperty("pageSize")),
+			Rectangle.valueOf(properties.getProperty("rectangle")),
 			spool,
 			U.care(properties.getProperty("fontPath")),
 			Paths.get(U.care(properties.getProperty("outputDirectory"))),

@@ -8,7 +8,7 @@ import com.ibm.as400.access.AS400;
 import jp.ats.nautilus.common.TextReader;
 import jp.ats.nautilus.common.U;
 import jp.ats.nautilus.dds.Controller.Result;
-import jp.ats.nautilus.pdf.PageSize;
+import jp.ats.nautilus.pdf.Rectangle;
 import jp.ats.nautilus.pdf.ReportContext;
 
 public class DynamicController {
@@ -85,7 +85,7 @@ public class DynamicController {
 			configure.marginLeftMM,
 			configure.marginTopMM,
 			configure.recordIndicatorPosition,
-			configure.page,
+			configure.rectangle,
 			spool,
 			fontPath,
 			outputDirectory,
@@ -124,7 +124,7 @@ public class DynamicController {
 
 		private final int recordIndicatorPosition;
 
-		private final PageSize page;
+		private final Rectangle rectangle;
 
 		private final String spoolLib;
 
@@ -140,7 +140,7 @@ public class DynamicController {
 			marginLeftMM = Integer.parseInt(elements[7]);
 			marginTopMM = Integer.parseInt(elements[8]);
 			recordIndicatorPosition = Integer.parseInt(elements[9]);
-			page = PageSize.valueOf(elements[10]);
+			rectangle = Rectangle.valueOf(elements[10]);
 			spoolLib = elements[11];
 			spoolFile = elements[12];
 		}

@@ -1,64 +1,41 @@
 package jp.ats.nautilus.pdf;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.lowagie.text.pdf.PdfReader;
+import jp.ats.nautilus.common.U;
 
 public class TemplateManager {
 
-	private static final Map<Path, PdfReader> map = new HashMap<>();
+	private static final Object lock = new Object();
+
+	private static final Map<Path, byte[]> contentCache = new HashMap<>();
+
+	private static final Map<Template, Path> pathCache = new HashMap<>();
 
 	public static Template createTemplate(Path pdfFile, int page)
 		throws IOException {
-		synchronized (map) {
-			PdfReader reader = map.get(pdfFile);
-			if (reader == null) {
-				reader = new PdfReader(Files.newInputStream(pdfFile));
-				map.put(pdfFile, reader);
+		synchronized (lock) {
+			byte[] content = contentCache.get(pdfFile);
+			if (content == null) {
+				content = U.readBytes(
+					new BufferedInputStream(Files.newInputStream(pdfFile)));
+				contentCache.put(pdfFile, content);
 			}
 
-			return new Template(pdfFile, reader, page);
+			Template template = new Template(content, page);
+
+			pathCache.put(template, pdfFile);
+
+			return template;
 		}
 	}
 
-	public static void close() {
-		synchronized (map) {
-			for (PdfReader reader : map.values()) {
-				reader.close();
-			}
-
-			map.clear();
-		}
-	}
-
-	public static class Template {
-
-		private final Path pdfFile;
-
-		private final PdfReader reader;
-
-		private final int page;
-
-		private Template(Path pdfFile, PdfReader reader, int page) {
-			this.pdfFile = pdfFile;
-			this.reader = reader;
-			this.page = page;
-		}
-
-		public Path getPDFFile() {
-			return pdfFile;
-		}
-
-		public int getPage() {
-			return page;
-		}
-
-		void draw(Canvas canvas) {
-			canvas.addTemplate(reader, page);
-		}
+	public static Path getTemplatePath(Template template) {
+		return pathCache.get(template);
 	}
 }

@@ -16,7 +16,7 @@ import jp.ats.nautilus.common.CollectionMap;
 import jp.ats.nautilus.common.U;
 import jp.ats.nautilus.pdf.Nautilus;
 import jp.ats.nautilus.pdf.ReportContext;
-import jp.ats.nautilus.pdf.TemplateManager.Template;
+import jp.ats.nautilus.pdf.Template;
 
 public class SpoolFileReportLister extends ReportLister {
 

@@ -18,7 +18,6 @@ import org.w3c.dom.Element;
 
 import jp.ats.nautilus.common.U;
 import jp.ats.nautilus.common.XPathNode;
-import jp.ats.nautilus.pdf.TemplateManager.Template;
 
 public class Nautilus {
 
@@ -36,7 +35,7 @@ public class Nautilus {
 
 	private Class<? extends FontManager> fontManagerClass;
 
-	private PageSize pageSize = PageSize.A4_LANDSCAPE;
+	private Rectangle rectangle = Rectangle.A4_LANDSCAPE;
 
 	private List<TemplateNode> templates = U.newLinkedList();
 
@@ -75,8 +74,8 @@ public class Nautilus {
 		this.fontManagerClass = fontManagerClass;
 	}
 
-	public void setPageSize(PageSize pageSize) {
-		this.pageSize = pageSize;
+	public void setRectangle(Rectangle rectangle) {
+		this.rectangle = rectangle;
 	}
 
 	public void addTemplate(Template template) {
@@ -116,7 +115,7 @@ public class Nautilus {
 		if (fontManagerClass != null)
 			root.setAttribute("font-manager", fontManagerClass.getName());
 
-		root.setAttribute("page-size", pageSize.name());
+		root.setAttribute("page-size", rectangle.name());
 		document.appendChild(root);
 
 		for (TemplateNode node : templates) {
@@ -172,7 +171,7 @@ public class Nautilus {
 			if (fontManagerNode != null)
 				fontManagerClass = forName(fontManagerNode.getNodeValue());
 
-			pageSize = PageSize
+			rectangle = Rectangle
 				.valueOf(report.selectNode("@page-size").getNodeValue());
 
 			XPathNode[] templateNodes = report.selectNodes("template");
@@ -227,7 +226,7 @@ public class Nautilus {
 				cpi,
 				marginLeftMM,
 				marginTopMM,
-				pageSize.getRectangle(),
+				rectangle,
 				output);
 
 			if (fontManagerClass != null) {

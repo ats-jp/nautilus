@@ -1,13 +1,10 @@
 package jp.ats.nautilus.pdf;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.BaseFont;
-
-import jp.ats.nautilus.pdf.TemplateManager.Template;
-
-public class Report {
+public class Report implements AutoCloseable {
 
 	private static final float lineWidth = 0.1f;
 
@@ -23,9 +20,9 @@ public class Report {
 
 	private final float rateX;
 
-	private final BaseFont font;
+	private final Font font;
 
-	private final BaseFont externalFont;
+	private final Font externalFont;
 
 	private final float cellHeight;
 
@@ -126,22 +123,26 @@ public class Report {
 
 	private static class DefaultFontManager implements FontManager {
 
-		private final BaseFont font;
+		private DefaultFontManager() {}
 
-		private DefaultFontManager() throws IOException, DocumentException {
-			font = BaseFont.createFont(
-				"c:/windows/fonts/msmincho.ttc,0",
-				BaseFont.IDENTITY_H,
-				BaseFont.EMBEDDED);
+		@Override
+		public Font createFont() {
+			return new Font() {
+
+				@Override
+				protected InputStream load() throws IOException {
+					return new FileInputStream("c:/windows/fonts/msmincho.ttc");
+				}
+
+				@Override
+				protected String name() {
+					return "MS-Mincho";
+				}
+			};
 		}
 
 		@Override
-		public BaseFont createFont() {
-			return font;
-		}
-
-		@Override
-		public BaseFont createExternalFont() {
+		public Font createExternalFont() {
 			return null;
 		}
 	}
@@ -176,15 +177,21 @@ public class Report {
 		externalFont = fontManager.createExternalFont();
 	}
 
-	public void drawTemplate(Template template) {
+	private Template currentTemplate;
+
+	public void setTemplate(Template template) {
 		LineProcess.OTHER.prepare(current, this);
-		template.draw(canvas);
+
+		if (currentTemplate != template) {
+			currentTemplate = template;
+			canvas.setTemplateDocument(template.getTemplateDocument());
+		}
+
+		canvas.selectTemplatePage(template.getPageIndex());
 	}
 
 	public void drawGrid() {
 		LineProcess.OTHER.prepare(current, this);
-
-		canvas.saveState();
 
 		canvas.setLineWidth(lineWidth);
 
@@ -225,8 +232,6 @@ public class Report {
 		}
 
 		canvas.stroke();
-
-		canvas.restoreState();
 	}
 
 	public void drawHorizontalLine(
@@ -271,8 +276,7 @@ public class Report {
 			verticalSize,
 			(startColumn - 1) * cellWidth,
 			(startLine + verticalSize - 1) * cellHeight
-				+ font.getFontDescriptor(BaseFont.DESCENT, fontPoint)
-					* verticalSize
+				+ canvas.getFontDescent(font, fontPoint) * verticalSize
 				- rise,
 			text);
 	}
@@ -285,8 +289,6 @@ public class Report {
 		String text) {
 		LineProcess.OTHER.prepare(current, this);
 
-		canvas.saveState();
-
 		canvas.setCharacterSpacing((cellWidth - fontWidthBase) * 2);
 
 		canvas.setFontAndSize(externalFont, fontPointBase);
@@ -298,7 +300,7 @@ public class Report {
 		//非表示となってしまうため、先頭だけでもずらすための処置
 		int invisibleCharactersOffset = 0;
 		for (char c : text.toCharArray()) {
-			if (!externalFont.charExists(c)) {
+			if (!canvas.charExists(externalFont, c)) {
 				invisibleCharactersOffset++;
 			} else {
 				break;
@@ -310,13 +312,10 @@ public class Report {
 			verticalSize,
 			(startColumn + invisibleCharactersOffset - 1) * cellWidth,
 			(startLine + verticalSize - 1) * cellHeight
-				+ externalFont
-					.getFontDescriptor(BaseFont.DESCENT, fontPointBase)
+				+ canvas.getFontDescent(externalFont, fontPointBase)
 					* verticalSize
 				- rise,
 			text);
-
-		canvas.restoreState();
 	}
 
 	public void drawUnderline(
@@ -348,55 +347,58 @@ public class Report {
 		}
 	}
 
-	public void drawBarcode(
-		BarcodeFactory factory,
-		int startLine,
-		int startColumn,
-		String barcode)
-		throws DocumentException {
-		LineProcess.OTHER.prepare(current, this);
+	//TODO barcode
+	//	public void drawBarcode(
+	//		BarcodeFactory factory,
+	//		int startLine,
+	//		int startColumn,
+	//		String barcode)
+	//		throws DocumentException {
+	//		LineProcess.OTHER.prepare(current, this);
+	//
+	//		canvas.barcode(
+	//			factory,
+	//			(startColumn - 1) * cellWidth,
+	//			(startLine - 1) * cellHeight,
+	//			barcode);
+	//	}
 
-		canvas.barcode(
-			factory,
-			(startColumn - 1) * cellWidth,
-			(startLine - 1) * cellHeight,
-			barcode);
-	}
-
-	public void drawBarcode39(int startLine, int startColumn, String barcode)
-		throws DocumentException {
-		drawBarcode(Canvas.BARCODE_39_DEFAULT, startLine, startColumn, barcode);
-	}
-
-	public void drawBarcode128(int startLine, int startColumn, String barcode)
-		throws DocumentException {
-		drawBarcode(
-			Canvas.BARCODE_128_DEFAULT,
-			startLine,
-			startColumn,
-			barcode);
-	}
-
-	public void drawBarcodeEAN(int startLine, int startColumn, String barcode)
-		throws DocumentException {
-		drawBarcode(
-			Canvas.BARCODE_EAN_DEFAULT,
-			startLine,
-			startColumn,
-			barcode);
-	}
+	//	public void drawBarcode39(int startLine, int startColumn, String barcode)
+	//		throws DocumentException {
+	//		drawBarcode(Canvas.BARCODE_39_DEFAULT, startLine, startColumn, barcode);
+	//	}
+	//
+	//	public void drawBarcode128(int startLine, int startColumn, String barcode)
+	//		throws DocumentException {
+	//		drawBarcode(
+	//			Canvas.BARCODE_128_DEFAULT,
+	//			startLine,
+	//			startColumn,
+	//			barcode);
+	//	}
+	//
+	//	public void drawBarcodeEAN(int startLine, int startColumn, String barcode)
+	//		throws DocumentException {
+	//		drawBarcode(
+	//			Canvas.BARCODE_EAN_DEFAULT,
+	//			startLine,
+	//			startColumn,
+	//			barcode);
+	//	}
 
 	public void newPage() {
 		LineProcess.OTHER.prepare(current, this);
 		canvas.newPage();
 	}
 
-	public int getPageNumber() {
-		return canvas.getPageNumber();
+	public int getNumberOfPages() {
+		return canvas.getNumberOfPages();
 	}
 
+	@Override
 	public void close() {
 		LineProcess.OTHER.prepare(current, this);
+		canvas.save();
 		canvas.close();
 	}
 
@@ -405,7 +407,7 @@ public class Report {
 
 		char[] chars = text.toCharArray();
 		for (char c : chars) {
-			if (externalFont.charExists(c)) return true;
+			if (canvas.charExists(externalFont, c)) return true;
 		}
 
 		return false;
@@ -417,13 +419,11 @@ public class Report {
 	}
 
 	private void startLineDraw(float lineWidth) {
-		canvas.saveState();
 		canvas.setLineWidth(lineWidth);
 	}
 
 	private void endLineDraw() {
 		canvas.stroke();
-		canvas.restoreState();
 	}
 
 	private void changeLineProcess(LineProcess next) {

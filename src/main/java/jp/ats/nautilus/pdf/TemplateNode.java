@@ -7,7 +7,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import jp.ats.nautilus.common.XPathNode;
-import jp.ats.nautilus.pdf.TemplateManager.Template;
 
 class TemplateNode extends Node {
 
@@ -25,7 +24,7 @@ class TemplateNode extends Node {
 
 	@Override
 	void draw(Report report) {
-		report.drawTemplate(template);
+		report.setTemplate(template);
 	}
 
 	@Override
@@ -33,8 +32,10 @@ class TemplateNode extends Node {
 		Element self = document.createElement("template");
 		self.setAttribute(
 			"file",
-			template.getPDFFile().toAbsolutePath().toString());
-		self.setAttribute("page", String.valueOf(template.getPage()));
+			TemplateManager.getTemplatePath(template)
+				.toAbsolutePath()
+				.toString());
+		self.setAttribute("page", String.valueOf(template.getPageIndex()));
 		parent.appendChild(self);
 	}
 }
