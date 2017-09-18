@@ -1,25 +1,18 @@
 package jp.ats.nautilus.pdf;
 
-import com.lowagie.text.pdf.Barcode;
+import org.krysalis.barcode4j.BarcodeGenerator;
 
 public interface BarcodeFactory {
 
-	void decorate(Barcode barcode);
+	int dpi();
 
-	Class<? extends Barcode> getBarcodeClass();
+	Class<? extends BarcodeGenerator> getBarcodeGeneratorClass();
 
-	default Barcode create(String barcode) {
-		Barcode code;
+	default BarcodeGenerator createBarcodeGenerator() {
 		try {
-			code = getBarcodeClass().newInstance();
+			return getBarcodeGeneratorClass().newInstance();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
-
-		decorate(code);
-
-		code.setCode(barcode);
-
-		return code;
 	}
 }

@@ -8,7 +8,7 @@ import java.io.InputStream;
 import jp.ats.nautilus.pdf.Font;
 import jp.ats.nautilus.pdf.FontManager;
 
-public class ConcreteFontManager implements FontManager {
+public class ConcreteFontManager extends FontManager {
 
 	private static String fontDirectory = "";
 

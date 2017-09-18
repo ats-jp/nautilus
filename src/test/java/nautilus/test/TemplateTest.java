@@ -60,5 +60,4 @@ public class TemplateTest {
 	public static Path getDesktopPath() {
 		return Paths.get(System.getProperty("user.home"), "Desktop");
 	}
-
 }

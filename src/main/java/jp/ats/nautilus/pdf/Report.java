@@ -317,44 +317,52 @@ public class Report implements AutoCloseable {
 		}
 	}
 
-	//TODO barcode
-	//	public void drawBarcode(
-	//		BarcodeFactory factory,
-	//		int startLine,
-	//		int startColumn,
-	//		String barcode)
-	//		throws DocumentException {
-	//		LineProcess.OTHER.prepare(current, this);
-	//
-	//		canvas.barcode(
-	//			factory,
-	//			(startColumn - 1) * cellWidth,
-	//			(startLine - 1) * cellHeight,
-	//			barcode);
-	//	}
+	public void drawBarcode(
+		BarcodeFactory factory,
+		int startLine,
+		int startColumn,
+		String barcode)
+		throws DocumentException {
+		LineProcess.OTHER.prepare(current, this);
 
-	//	public void drawBarcode39(int startLine, int startColumn, String barcode)
-	//		throws DocumentException {
-	//		drawBarcode(Canvas.BARCODE_39_DEFAULT, startLine, startColumn, barcode);
-	//	}
-	//
-	//	public void drawBarcode128(int startLine, int startColumn, String barcode)
-	//		throws DocumentException {
-	//		drawBarcode(
-	//			Canvas.BARCODE_128_DEFAULT,
-	//			startLine,
-	//			startColumn,
-	//			barcode);
-	//	}
-	//
-	//	public void drawBarcodeEAN(int startLine, int startColumn, String barcode)
-	//		throws DocumentException {
-	//		drawBarcode(
-	//			Canvas.BARCODE_EAN_DEFAULT,
-	//			startLine,
-	//			startColumn,
-	//			barcode);
-	//	}
+		canvas.barcode(
+			factory,
+			(startColumn - 1) * cellWidth,
+			(startLine - 1) * cellHeight,
+			barcode);
+	}
+
+	public void drawBarcode39(int startLine, int startColumn, String barcode)
+		throws DocumentException {
+		drawBarcode(Canvas.BARCODE_39_DEFAULT, startLine, startColumn, barcode);
+	}
+
+	public void drawBarcode128(int startLine, int startColumn, String barcode)
+		throws DocumentException {
+		drawBarcode(
+			Canvas.BARCODE_128_DEFAULT,
+			startLine,
+			startColumn,
+			barcode);
+	}
+
+	public void drawBarcodeEAN8(int startLine, int startColumn, String barcode)
+		throws DocumentException {
+		drawBarcode(
+			Canvas.BARCODE_EAN8_DEFAULT,
+			startLine,
+			startColumn,
+			barcode);
+	}
+
+	public void drawBarcodeEAN13(int startLine, int startColumn, String barcode)
+		throws DocumentException {
+		drawBarcode(
+			Canvas.BARCODE_EAN13_DEFAULT,
+			startLine,
+			startColumn,
+			barcode);
+	}
 
 	public void newPage() {
 		LineProcess.OTHER.prepare(current, this);
