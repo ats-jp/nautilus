@@ -6,6 +6,10 @@ public interface BarcodeFactory {
 
 	int dpi();
 
+	float magnification();
+
+	void decorate(BarcodeGenerator generator);
+
 	Class<? extends BarcodeGenerator> getBarcodeGeneratorClass();
 
 	default BarcodeGenerator createBarcodeGenerator() {

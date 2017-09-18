@@ -26,19 +26,27 @@ public class Canvas implements AutoCloseable {
 
 	public static final BarcodeFactory BARCODE_39_DEFAULT = new SimpleBarcodeFactory(
 		Code39Bean.class,
-		200);
+		200,
+		10,
+		0.5f);
 
 	public static final BarcodeFactory BARCODE_128_DEFAULT = new SimpleBarcodeFactory(
 		Code128Bean.class,
-		200);
+		200,
+		10,
+		0.5f);
 
 	public static final BarcodeFactory BARCODE_EAN8_DEFAULT = new SimpleBarcodeFactory(
 		EAN8Bean.class,
-		200);
+		200,
+		10,
+		0.5f);
 
 	public static final BarcodeFactory BARCODE_EAN13_DEFAULT = new SimpleBarcodeFactory(
 		EAN13Bean.class,
-		200);
+		200,
+		10,
+		0.5f);
 
 	private static final float inchPoint = 72; // Points per Inch
 
@@ -172,6 +180,8 @@ public class Canvas implements AutoCloseable {
 	void barcode(BarcodeFactory factory, float x, float y, String barcode) {
 		BarcodeGenerator generator = factory.createBarcodeGenerator();
 
+		factory.decorate(generator);
+
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		BitmapCanvasProvider provider = new BitmapCanvasProvider(
 			output,
@@ -191,11 +201,13 @@ public class Canvas implements AutoCloseable {
 			PDImageXObject image = PDImageXObject
 				.createFromByteArray(document, barcodeBytes, null);
 
-			float height = image.getHeight();
+			float magnification = factory.magnification();
+
+			float height = image.getHeight() * magnification;
 			currentStream.drawImage(
 				image,
 				new Matrix(
-					image.getWidth(),
+					image.getWidth() * magnification,
 					0,
 					0,
 					height,
