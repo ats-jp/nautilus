@@ -1,5 +1,6 @@
 package jp.ats.nautilus.pdf;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,6 +24,8 @@ public class Canvas implements AutoCloseable {
 
 	static final float inchPoint = 72; // Points per Inch
 
+	private static final Color defaultNonStrokingColor = Color.BLACK;
+
 	private final int rows;
 
 	private final int columns;
@@ -45,7 +48,7 @@ public class Canvas implements AutoCloseable {
 
 	private final Map<Integer, PDPage> templatePageCache = new HashMap<>();
 
-	private final LinkedList<Float> StrokingColorStack = new LinkedList<>();
+	private final LinkedList<Float> strokingColorStack = new LinkedList<>();
 
 	private PDPageContentStream currentStream;
 
@@ -87,7 +90,7 @@ public class Canvas implements AutoCloseable {
 	void saveState() {
 		try {
 			currentStream.saveGraphicsState();
-			StrokingColorStack.push(currentStrokingColor);
+			strokingColorStack.push(currentStrokingColor);
 		} catch (IOException e) {
 			throw new DocumentException(e);
 		}
@@ -96,7 +99,7 @@ public class Canvas implements AutoCloseable {
 	void restoreState() {
 		try {
 			currentStream.restoreGraphicsState();
-			currentStrokingColor = StrokingColorStack.pop();
+			currentStrokingColor = strokingColorStack.pop();
 			currentStream.setStrokingColor(currentStrokingColor);
 		} catch (IOException e) {
 			throw new DocumentException(e);
@@ -227,6 +230,20 @@ public class Canvas implements AutoCloseable {
 					height,
 					startX + x,
 					startY - y - height));
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
+	}
+
+	void rectangle(float x, float y, float width, float height, Color color) {
+		try {
+			currentStream.setNonStrokingColor(color);
+			currentStream.addRect(x, y, width, height);
+
+			currentStream.fill();
+
+			//矩形描画はここのみなので、ここでしかリセットしない
+			currentStream.setNonStrokingColor(defaultNonStrokingColor);
 		} catch (IOException e) {
 			throw new DocumentException(e);
 		}

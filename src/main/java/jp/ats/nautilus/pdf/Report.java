@@ -1,5 +1,7 @@
 package jp.ats.nautilus.pdf;
 
+import java.awt.Color;
+
 import org.krysalis.barcode4j.impl.code128.Code128Bean;
 import org.krysalis.barcode4j.impl.code39.Code39Bean;
 import org.krysalis.barcode4j.impl.upcean.EAN13Bean;
@@ -488,6 +490,20 @@ public class Report implements AutoCloseable {
 	public void drawBarcodeEAN13(int startLine, int startColumn, String barcode)
 		throws DocumentException {
 		drawBarcode(BARCODE_EAN13_DEFAULT, startLine, startColumn, barcode);
+	}
+
+	public void drawRectangle(
+		int startLine,
+		int startColumn,
+		int widthLength,
+		int heightLength,
+		Color color) {
+		float x = (startColumn - 1) * cellWidth;
+		float y = (startLine - 1) * cellHeight;
+		float width = widthLength * cellWidth;
+		float height = heightLength * cellWidth;
+
+		canvas.rectangle(x, y, width, height, color);
 	}
 
 	public void newPage() {
