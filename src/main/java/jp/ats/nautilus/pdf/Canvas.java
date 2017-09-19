@@ -21,7 +21,7 @@ import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 
 public class Canvas implements AutoCloseable {
 
-	private static final float inchPoint = 72; // Points per Inch
+	static final float inchPoint = 72; // Points per Inch
 
 	private final int rows;
 
@@ -121,6 +121,22 @@ public class Canvas implements AutoCloseable {
 
 	void line(float fromX, float fromY, float toX, float toY) {
 		try {
+			currentStream.moveTo(startX + fromX, startY - fromY);
+			currentStream.lineTo(startX + toX, startY - toY);
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
+	}
+
+	void dashLine(
+		float[] dashPattern,
+		float dashPatternPhase,
+		float fromX,
+		float fromY,
+		float toX,
+		float toY) {
+		try {
+			currentStream.setLineDashPattern(dashPattern, dashPatternPhase);
 			currentStream.moveTo(startX + fromX, startY - fromY);
 			currentStream.lineTo(startX + toX, startY - toY);
 		} catch (IOException e) {

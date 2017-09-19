@@ -13,7 +13,9 @@ public class Report implements AutoCloseable {
 
 	private static final float underlineWidth = 0.5f;
 
-	private static final float inchPoint = 72; // Points per Inch
+	private static final float[] lineDashPattern = { 2f, 2f };
+
+	private static final float lineDashPatternPhase = 2f;
 
 	private final float fontPointBase;
 
@@ -33,13 +35,23 @@ public class Report implements AutoCloseable {
 
 	private final Canvas canvas;
 
-	public static enum LineWidth {
+	public static enum LineType {
 
 		NORMAL {
 
 			@Override
 			LineProcess getProcess() {
 				return LineProcess.LINE;
+			}
+
+			@Override
+			void line(
+				Canvas canvas,
+				float fromX,
+				float fromY,
+				float toX,
+				float toY) {
+				canvas.line(fromX, fromY, toX, toY);
 			}
 		},
 
@@ -49,9 +61,88 @@ public class Report implements AutoCloseable {
 			LineProcess getProcess() {
 				return LineProcess.BOLDLINE;
 			}
+
+			@Override
+			void line(
+				Canvas canvas,
+				float fromX,
+				float fromY,
+				float toX,
+				float toY) {
+				canvas.line(fromX, fromY, toX, toY);
+			}
+		},
+
+		DASH {
+
+			@Override
+			LineProcess getProcess() {
+				return LineProcess.DASHLINE;
+			}
+
+			@Override
+			void line(
+				Canvas canvas,
+				float fromX,
+				float fromY,
+				float toX,
+				float toY) {
+				canvas.dashLine(
+					lineDashPattern,
+					lineDashPatternPhase,
+					fromX,
+					fromY,
+					toX,
+					toY);
+			}
+		},
+
+		DOUBLE {
+
+			@Override
+			LineProcess getProcess() {
+				return LineProcess.LINE;
+			}
+
+			@Override
+			void line(
+				Canvas canvas,
+				float fromX,
+				float fromY,
+				float toX,
+				float toY) {
+				float distance = 0.5f;
+				if (fromX == toX) {
+					//垂直線
+					canvas.line(fromX - distance, fromY, toX - distance, toY);
+					canvas.line(fromX + distance, fromY, toX + distance, toY);
+				} else if (fromY == toY) {
+					//水平線
+					canvas.line(fromX, fromY - distance, toX, toY - distance);
+					canvas.line(fromX, fromY + distance, toX, toY + distance);
+				} else {
+					throw new IllegalStateException(
+						"invalid line:"
+							+ " fromX="
+							+ fromX
+							+ ", fromY="
+							+ fromY
+							+ ", toX="
+							+ toX
+							+ ", toY="
+							+ toY);
+				}
+			}
 		};
 
 		abstract LineProcess getProcess();
+
+		abstract void line(
+			Canvas canvas,
+			float fromX,
+			float fromY,
+			float toX,
+			float toY);
 	}
 
 	/**
@@ -73,6 +164,19 @@ public class Report implements AutoCloseable {
 		},
 
 		BOLDLINE {
+
+			@Override
+			void start(Report report) {
+				report.startLineDraw(boldlineWidth);
+			}
+
+			@Override
+			void end(Report report) {
+				report.endLineDraw();
+			}
+		},
+
+		DASHLINE {
 
 			@Override
 			void start(Report report) {
@@ -153,14 +257,14 @@ public class Report implements AutoCloseable {
 	public Report(Canvas canvas, FontManager fontManager) {
 		this.canvas = canvas;
 
-		fontWidthBase = inchPoint / 15; // 1inch / maxCPI
+		fontWidthBase = Canvas.inchPoint / 15; // 1inch / maxCPI
 		fontPointBase = fontWidthBase * 2;
 
 		float lpi = canvas.getLPI();
 		float cpi = canvas.getCPI();
 
-		cellHeight = inchPoint / lpi;
-		cellWidth = inchPoint / cpi;
+		cellHeight = Canvas.inchPoint / lpi;
+		cellWidth = Canvas.inchPoint / cpi;
 
 		if (cellWidth * 2 > cellHeight) {
 			//横長
@@ -212,7 +316,7 @@ public class Report implements AutoCloseable {
 				canvas.setGrayStroke(dark);
 			}
 
-			drawHorizontalLine(LineWidth.NORMAL, i, 0, columns);
+			drawHorizontalLine(LineType.NORMAL, i, 0, columns);
 
 			if (i % 10 == 0) {
 				canvas.stroke();
@@ -226,7 +330,7 @@ public class Report implements AutoCloseable {
 				canvas.setGrayStroke(dark);
 			}
 
-			drawVerticalLine(LineWidth.NORMAL, 1, i, rows);
+			drawVerticalLine(LineType.NORMAL, 1, i, rows);
 
 			if (i % 10 == 0) {
 				canvas.stroke();
@@ -240,27 +344,27 @@ public class Report implements AutoCloseable {
 	}
 
 	public void drawHorizontalLine(
-		LineWidth width,
+		LineType type,
 		int startLine,
 		int startColumn,
 		int length) {
-		width.getProcess().prepare(current, this);
+		type.getProcess().prepare(current, this);
 
 		float x = startColumn * cellWidth;
 		float y = startLine * cellHeight;
-		canvas.line(x, y, x + length * cellWidth, y);
+		type.line(canvas, x, y, x + length * cellWidth, y);
 	}
 
 	public void drawVerticalLine(
-		LineWidth width,
+		LineType type,
 		int startLine,
 		int startColumn,
 		int length) {
-		width.getProcess().prepare(current, this);
+		type.getProcess().prepare(current, this);
 
 		float x = startColumn * cellWidth;
 		float y = (startLine - 1) * cellHeight;
-		canvas.line(x, y, x, y + length * cellHeight);
+		type.line(canvas, x, y, x, y + length * cellHeight);
 	}
 
 	public void drawText(

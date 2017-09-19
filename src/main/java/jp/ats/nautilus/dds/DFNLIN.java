@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import jp.ats.nautilus.pdf.Page;
 import jp.ats.nautilus.pdf.Page.LineDirection;
-import jp.ats.nautilus.pdf.Report.LineWidth;
+import jp.ats.nautilus.pdf.Report.LineType;
 
 public class DFNLIN extends ConditionHolder {
 
@@ -14,7 +14,7 @@ public class DFNLIN extends ConditionHolder {
 
 	private final LineDirection direction;
 
-	private final LineWidth width;
+	private final LineType type;
 
 	private final int startLine;
 
@@ -34,17 +34,17 @@ public class DFNLIN extends ConditionHolder {
 			direction = LineDirection.VERTICAL;
 		}
 
-		LineWidth width;
+		LineType type;
 		String expansionArea = DDSFile.getCurrentExpansionArea();
 		if (expansionArea.trim().equals("@@1@")) {
-			width = LineWidth.BOLD;
+			type = LineType.BOLD;
 		} else {
-			width = LineWidth.NORMAL;
+			type = LineType.NORMAL;
 		}
 
 		return new DFNLIN(
 			direction,
-			width,
+			type,
 			Integer.parseInt(matcher.group(2)),
 			Integer.parseInt(matcher.group(3)),
 			Integer.parseInt(matcher.group(4)));
@@ -52,18 +52,18 @@ public class DFNLIN extends ConditionHolder {
 
 	private DFNLIN(
 		LineDirection direction,
-		LineWidth width,
+		LineType type,
 		int startLine,
 		int startColumn,
 		int length) {
 		this.direction = direction;
-		this.width = width;
+		this.type = type;
 		this.startLine = startLine;
 		this.startColumn = startColumn;
 		this.length = length;
 	}
 
 	void add(Page page) {
-		page.addLine(direction, width, startLine, startColumn, length);
+		page.addLine(direction, type, startLine, startColumn, length);
 	}
 }

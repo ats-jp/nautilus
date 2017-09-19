@@ -6,7 +6,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import jp.ats.nautilus.common.U;
-import jp.ats.nautilus.pdf.Report.LineWidth;
+import jp.ats.nautilus.pdf.Report.LineType;
 
 public class Page implements Comparable<Page> {
 
@@ -27,11 +27,11 @@ public class Page implements Comparable<Page> {
 
 	public void addLine(
 		LineDirection direction,
-		LineWidth width,
+		LineType type,
 		int row,
 		int column,
 		int length) {
-		nodes.add(new LineNode(direction, width, row, column, length));
+		nodes.add(new LineNode(direction, type, row, column, length));
 	}
 
 	public void addText(

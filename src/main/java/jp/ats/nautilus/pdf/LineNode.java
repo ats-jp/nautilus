@@ -5,13 +5,13 @@ import org.w3c.dom.Element;
 
 import jp.ats.nautilus.common.XPathNode;
 import jp.ats.nautilus.pdf.Page.LineDirection;
-import jp.ats.nautilus.pdf.Report.LineWidth;
+import jp.ats.nautilus.pdf.Report.LineType;
 
 class LineNode extends Node {
 
 	private final LineDirection direction;
 
-	private final LineWidth width;
+	private final LineType type;
 
 	private final int row, column, length;
 
@@ -21,12 +21,12 @@ class LineNode extends Node {
 
 	LineNode(
 		LineDirection direction,
-		LineWidth width,
+		LineType type,
 		int row,
 		int column,
 		int length) {
 		this.direction = direction;
-		this.width = width;
+		this.type = type;
 		this.row = row;
 		this.column = column;
 		this.length = length;
@@ -35,7 +35,7 @@ class LineNode extends Node {
 	LineNode(XPathNode node) {
 		direction = LineDirection
 			.valueOf(node.selectNode("@direction").getNodeValue());
-		width = LineWidth.valueOf(node.selectNode("@width").getNodeValue());
+		type = LineType.valueOf(node.selectNode("@type").getNodeValue());
 		row = Integer.parseInt(node.selectNode("@row").getNodeValue());
 		column = Integer.parseInt(node.selectNode("@column").getNodeValue());
 		length = Integer.parseInt(node.selectNode("@length").getNodeValue());
@@ -45,10 +45,10 @@ class LineNode extends Node {
 	void draw(Report report) {
 		switch (direction) {
 		case HORIZONTAL:
-			report.drawHorizontalLine(width, row, column, length);
+			report.drawHorizontalLine(type, row, column, length);
 			break;
 		case VERTICAL:
-			report.drawVerticalLine(width, row, column, length);
+			report.drawVerticalLine(type, row, column, length);
 			break;
 		default:
 			throw new IllegalStateException();
@@ -59,7 +59,7 @@ class LineNode extends Node {
 	void appendSelf(Document document, Element parent) {
 		Element self = document.createElement("line");
 		self.setAttribute("direction", direction.name());
-		self.setAttribute("width", width.name());
+		self.setAttribute("type", type.name());
 		self.setAttribute("row", String.valueOf(row));
 		self.setAttribute("column", String.valueOf(column));
 		self.setAttribute("length", String.valueOf(length));
