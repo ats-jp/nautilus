@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.apache.pdfbox.cos.COSDictionary;
@@ -42,13 +43,19 @@ public class Canvas implements AutoCloseable {
 
 	private final OutputStream output;
 
+	private final Map<Integer, PDPage> templatePageCache = new HashMap<>();
+
+	private final LinkedList<Float> StrokingColorStack = new LinkedList<>();
+
 	private PDPageContentStream currentStream;
+
+	private Map<Template, PDDocument> templateDocuments = new HashMap<>();
 
 	private PDDocument currentTemplateDocument;
 
 	private PDPage currentTemplatePage;
 
-	private final Map<Integer, PDPage> templatePageCache = new HashMap<>();
+	private float currentStrokingColor = 0f;
 
 	public Canvas(
 		int rows,
@@ -75,6 +82,25 @@ public class Canvas implements AutoCloseable {
 
 		startX = marginLeftPoint;
 		startY = rectangle.getHeight() - marginTopPoint;
+	}
+
+	void saveState() {
+		try {
+			currentStream.saveGraphicsState();
+			StrokingColorStack.push(currentStrokingColor);
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
+	}
+
+	void restoreState() {
+		try {
+			currentStream.restoreGraphicsState();
+			currentStrokingColor = StrokingColorStack.pop();
+			currentStream.setStrokingColor(currentStrokingColor);
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
 	}
 
 	void setLineWidth(float width) {
@@ -211,14 +237,19 @@ public class Canvas implements AutoCloseable {
 		}
 	}
 
-	void setTemplateDocument(byte[] pdf) {
+	void setTemplateDocument(Template template) {
 		templatePageCache.clear();
 		currentTemplatePage = null;
 
-		try {
-			currentTemplateDocument = PDDocument.load(pdf);
-		} catch (IOException e) {
-			throw new DocumentException(e);
+		currentTemplateDocument = templateDocuments.get(template);
+		if (currentTemplateDocument == null) {
+			try {
+				currentTemplateDocument = PDDocument
+					.load(template.getTemplateDocument());
+				templateDocuments.put(template, currentTemplateDocument);
+			} catch (IOException e) {
+				throw new DocumentException(e);
+			}
 		}
 	}
 
@@ -251,6 +282,8 @@ public class Canvas implements AutoCloseable {
 			document.addPage(page);
 
 			currentStream = rectangle.newPageContentStream(document, page);
+
+			currentStream.setStrokingColor(currentStrokingColor);
 		} catch (IOException e) {
 			throw new DocumentException(e);
 		}
@@ -278,6 +311,14 @@ public class Canvas implements AutoCloseable {
 	public void close() {
 		try {
 			document.close();
+
+			templateDocuments.values().forEach(document -> {
+				try {
+					document.close();
+				} catch (IOException e) {
+					throw new DocumentException(e);
+				}
+			});
 		} catch (IOException e) {
 			throw new DocumentException(e);
 		}

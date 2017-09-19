@@ -78,8 +78,8 @@ public class Nautilus {
 		this.rectangle = rectangle;
 	}
 
-	public void addTemplate(Template template) {
-		templates.add(new TemplateNode(template));
+	public void addTemplate(TemplatePage templatePage) {
+		templates.add(new TemplateNode(templatePage));
 	}
 
 	public Page currentPage() {

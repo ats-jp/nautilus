@@ -16,7 +16,7 @@ import jp.ats.nautilus.common.CollectionMap;
 import jp.ats.nautilus.common.U;
 import jp.ats.nautilus.pdf.Nautilus;
 import jp.ats.nautilus.pdf.ReportContext;
-import jp.ats.nautilus.pdf.Template;
+import jp.ats.nautilus.pdf.TemplatePage;
 
 public class SpoolFileReportLister extends ReportLister {
 
@@ -63,9 +63,9 @@ public class SpoolFileReportLister extends ReportLister {
 		this.dds = dds;
 
 		if (templateVendor != null) {
-			for (Template template : templateVendor
+			for (TemplatePage templatePage : templateVendor
 				.getTemplates(dds.getName())) {
-				nautilus.addTemplate(template);
+				nautilus.addTemplate(templatePage);
 			}
 		}
 

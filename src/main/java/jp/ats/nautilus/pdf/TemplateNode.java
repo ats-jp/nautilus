@@ -10,21 +10,21 @@ import jp.ats.nautilus.common.XPathNode;
 
 class TemplateNode extends Node {
 
-	private final Template template;
+	private final TemplatePage templatePage;
 
-	TemplateNode(Template template) {
-		this.template = template;
+	TemplateNode(TemplatePage templatePage) {
+		this.templatePage = templatePage;
 	}
 
 	TemplateNode(XPathNode node) throws IOException {
-		this.template = TemplateManager.createTemplate(
+		this.templatePage = TemplateManager.createTemplatePage(
 			Paths.get(node.selectNode("@file").getNodeValue()),
 			Integer.parseInt(node.selectNode("@page").getNodeValue()));
 	}
 
 	@Override
 	void draw(Report report) {
-		report.setTemplate(template);
+		report.setTemplatePage(templatePage);
 	}
 
 	@Override
@@ -32,10 +32,10 @@ class TemplateNode extends Node {
 		Element self = document.createElement("template");
 		self.setAttribute(
 			"file",
-			TemplateManager.getTemplatePath(template)
+			TemplateManager.getTemplatePath(templatePage)
 				.toAbsolutePath()
 				.toString());
-		self.setAttribute("page", String.valueOf(template.getPageIndex()));
+		self.setAttribute("page", String.valueOf(templatePage.getPageIndex()));
 		parent.appendChild(self);
 	}
 }

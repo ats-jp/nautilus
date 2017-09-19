@@ -176,21 +176,25 @@ public class Report implements AutoCloseable {
 		externalFont = fontManager.getExternalFont();
 	}
 
-	private Template currentTemplate;
+	public void setTemplatePage(TemplatePage templatePage) {
+		LineProcess.OTHER.prepare(current, this);
+		canvas.setTemplateDocument(templatePage.getTemplate());
+		canvas.selectTemplatePage(templatePage.getPageIndex());
+	}
 
 	public void setTemplate(Template template) {
 		LineProcess.OTHER.prepare(current, this);
+		canvas.setTemplateDocument(template);
+	}
 
-		if (currentTemplate != template) {
-			currentTemplate = template;
-			canvas.setTemplateDocument(template.getTemplateDocument());
-		}
-
-		canvas.selectTemplatePage(template.getPageIndex());
+	public void selectTemplatePage(int pageIndex) {
+		canvas.selectTemplatePage(pageIndex);
 	}
 
 	public void drawGrid() {
 		LineProcess.OTHER.prepare(current, this);
+
+		canvas.saveState();
 
 		canvas.setLineWidth(lineWidth);
 
@@ -231,6 +235,8 @@ public class Report implements AutoCloseable {
 		}
 
 		canvas.stroke();
+
+		canvas.restoreState();
 	}
 
 	public void drawHorizontalLine(
@@ -288,6 +294,8 @@ public class Report implements AutoCloseable {
 		String text) {
 		LineProcess.OTHER.prepare(current, this);
 
+		canvas.saveState();
+
 		canvas.setCharacterSpacing((cellWidth - fontWidthBase) * 2);
 
 		canvas.setFontAndSize(externalFont, fontPointBase);
@@ -315,6 +323,8 @@ public class Report implements AutoCloseable {
 					* verticalSize
 				- rise,
 			text);
+
+		canvas.restoreState();
 	}
 
 	public void drawUnderline(
@@ -409,11 +419,13 @@ public class Report implements AutoCloseable {
 	}
 
 	private void startLineDraw(float lineWidth) {
+		canvas.saveState();
 		canvas.setLineWidth(lineWidth);
 	}
 
 	private void endLineDraw() {
 		canvas.stroke();
+		canvas.restoreState();
 	}
 
 	private void changeLineProcess(LineProcess next) {

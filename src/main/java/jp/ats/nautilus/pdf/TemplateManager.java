@@ -13,29 +13,31 @@ public class TemplateManager {
 
 	private static final Object lock = new Object();
 
-	private static final Map<Path, byte[]> contentCache = new HashMap<>();
+	private static final Map<Path, Template> templateCache = new HashMap<>();
 
 	private static final Map<Template, Path> pathCache = new HashMap<>();
 
-	public static Template createTemplate(Path pdfFile, int page)
+	public static TemplatePage createTemplatePage(Path pdfFile, int page)
 		throws IOException {
 		synchronized (lock) {
-			byte[] content = contentCache.get(pdfFile);
-			if (content == null) {
-				content = U.readBytes(
-					new BufferedInputStream(Files.newInputStream(pdfFile)));
-				contentCache.put(pdfFile, content);
+			Template template = templateCache.get(pdfFile);
+			if (template == null) {
+				template = new Template(
+					U.readBytes(
+						new BufferedInputStream(
+							Files.newInputStream(pdfFile))));
+				templateCache.put(pdfFile, template);
 			}
 
-			Template template = new Template(content, page);
+			TemplatePage templatePage = new TemplatePage(template, page);
 
 			pathCache.put(template, pdfFile);
 
-			return template;
+			return templatePage;
 		}
 	}
 
-	public static Path getTemplatePath(Template template) {
-		return pathCache.get(template);
+	public static Path getTemplatePath(TemplatePage templatePage) {
+		return pathCache.get(templatePage.getTemplate());
 	}
 }

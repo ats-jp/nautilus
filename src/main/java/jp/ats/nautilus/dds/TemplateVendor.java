@@ -6,14 +6,14 @@ import java.util.Collection;
 
 import jp.ats.nautilus.common.CollectionMap;
 import jp.ats.nautilus.common.TextReader;
-import jp.ats.nautilus.pdf.Template;
 import jp.ats.nautilus.pdf.TemplateManager;
+import jp.ats.nautilus.pdf.TemplatePage;
 
 public class TemplateVendor {
 
-	private static final Template[] enptyArray = {};
+	private static final TemplatePage[] emptyArray = {};
 
-	private final CollectionMap<String, Template> map = CollectionMap
+	private final CollectionMap<String, TemplatePage> map = CollectionMap
 		.newInstance();
 
 	public TemplateVendor() {}
@@ -28,16 +28,16 @@ public class TemplateVendor {
 			String[] columns = line.trim().split("\\s+");
 			map.put(
 				columns[0],
-				TemplateManager.createTemplate(
+				TemplateManager.createTemplatePage(
 					templateDirectory.resolve(columns[1]),
 					Integer.parseInt(columns[2])));
 		}
 	}
 
-	public Template[] getTemplates(String ddsName) {
-		Collection<Template> templates = map.get(ddsName);
-		if (templates.size() == 0) return enptyArray;
+	public TemplatePage[] getTemplates(String ddsName) {
+		Collection<TemplatePage> templates = map.get(ddsName);
+		if (templates.size() == 0) return emptyArray;
 
-		return templates.toArray(new Template[templates.size()]);
+		return templates.toArray(new TemplatePage[templates.size()]);
 	}
 }
