@@ -16,37 +16,9 @@ import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.util.Matrix;
 import org.krysalis.barcode4j.BarcodeGenerator;
-import org.krysalis.barcode4j.impl.code128.Code128Bean;
-import org.krysalis.barcode4j.impl.code39.Code39Bean;
-import org.krysalis.barcode4j.impl.upcean.EAN13Bean;
-import org.krysalis.barcode4j.impl.upcean.EAN8Bean;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 
 public class Canvas implements AutoCloseable {
-
-	public static final BarcodeFactory BARCODE_39_DEFAULT = new SimpleBarcodeFactory(
-		Code39Bean.class,
-		200,
-		10,
-		0.5f);
-
-	public static final BarcodeFactory BARCODE_128_DEFAULT = new SimpleBarcodeFactory(
-		Code128Bean.class,
-		200,
-		10,
-		0.5f);
-
-	public static final BarcodeFactory BARCODE_EAN8_DEFAULT = new SimpleBarcodeFactory(
-		EAN8Bean.class,
-		200,
-		10,
-		0.5f);
-
-	public static final BarcodeFactory BARCODE_EAN13_DEFAULT = new SimpleBarcodeFactory(
-		EAN13Bean.class,
-		200,
-		10,
-		0.5f);
 
 	private static final float inchPoint = 72; // Points per Inch
 

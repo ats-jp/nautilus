@@ -1,5 +1,10 @@
 package jp.ats.nautilus.pdf;
 
+import org.krysalis.barcode4j.impl.code128.Code128Bean;
+import org.krysalis.barcode4j.impl.code39.Code39Bean;
+import org.krysalis.barcode4j.impl.upcean.EAN13Bean;
+import org.krysalis.barcode4j.impl.upcean.EAN8Bean;
+
 public class Report implements AutoCloseable {
 
 	private static final float lineWidth = 0.1f;
@@ -116,6 +121,30 @@ public class Report implements AutoCloseable {
 	}
 
 	private LineProcess current = LineProcess.OTHER;
+
+	public static final BarcodeFactory BARCODE_39_DEFAULT = new SimpleBarcodeFactory(
+		Code39Bean.class,
+		200,
+		10,
+		0.5f);
+
+	public static final BarcodeFactory BARCODE_128_DEFAULT = new SimpleBarcodeFactory(
+		Code128Bean.class,
+		200,
+		10,
+		0.5f);
+
+	public static final BarcodeFactory BARCODE_EAN8_DEFAULT = new SimpleBarcodeFactory(
+		EAN8Bean.class,
+		200,
+		10,
+		0.5f);
+
+	public static final BarcodeFactory BARCODE_EAN13_DEFAULT = new SimpleBarcodeFactory(
+		EAN13Bean.class,
+		200,
+		10,
+		0.5f);
 
 	public Report(Canvas canvas) {
 		this(canvas, new SimpleFontManager());
@@ -334,34 +363,22 @@ public class Report implements AutoCloseable {
 
 	public void drawBarcode39(int startLine, int startColumn, String barcode)
 		throws DocumentException {
-		drawBarcode(Canvas.BARCODE_39_DEFAULT, startLine, startColumn, barcode);
+		drawBarcode(BARCODE_39_DEFAULT, startLine, startColumn, barcode);
 	}
 
 	public void drawBarcode128(int startLine, int startColumn, String barcode)
 		throws DocumentException {
-		drawBarcode(
-			Canvas.BARCODE_128_DEFAULT,
-			startLine,
-			startColumn,
-			barcode);
+		drawBarcode(BARCODE_128_DEFAULT, startLine, startColumn, barcode);
 	}
 
 	public void drawBarcodeEAN8(int startLine, int startColumn, String barcode)
 		throws DocumentException {
-		drawBarcode(
-			Canvas.BARCODE_EAN8_DEFAULT,
-			startLine,
-			startColumn,
-			barcode);
+		drawBarcode(BARCODE_EAN8_DEFAULT, startLine, startColumn, barcode);
 	}
 
 	public void drawBarcodeEAN13(int startLine, int startColumn, String barcode)
 		throws DocumentException {
-		drawBarcode(
-			Canvas.BARCODE_EAN13_DEFAULT,
-			startLine,
-			startColumn,
-			barcode);
+		drawBarcode(BARCODE_EAN13_DEFAULT, startLine, startColumn, barcode);
 	}
 
 	public void newPage() {
