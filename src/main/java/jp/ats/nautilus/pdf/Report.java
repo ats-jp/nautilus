@@ -11,7 +11,7 @@ public class Report implements AutoCloseable {
 
 	private static final float boldlineWidth = 0.5f;
 
-	private static final float underlineWidth = 0.5f;
+	private static final float underlineWidth = 0.1f;
 
 	private static final float[] lineDashPattern = { 2f, 2f };
 
@@ -384,9 +384,7 @@ public class Report implements AutoCloseable {
 			horizontalSize * rateX,
 			verticalSize,
 			(startColumn - 1) * cellWidth,
-			(startLine + verticalSize - 1) * cellHeight
-				+ canvas.getFontDescent(font, fontPoint) * verticalSize
-				- rise,
+			(startLine + verticalSize - 1) * cellHeight - rise,
 			text);
 	}
 
@@ -422,10 +420,7 @@ public class Report implements AutoCloseable {
 			horizontalSize,
 			verticalSize,
 			(startColumn + invisibleCharactersOffset - 1) * cellWidth,
-			(startLine + verticalSize - 1) * cellHeight
-				+ canvas.getFontDescent(externalFont, fontPointBase)
-					* verticalSize
-				- rise,
+			(startLine + verticalSize - 1) * cellHeight - rise,
 			text);
 
 		canvas.restoreState();

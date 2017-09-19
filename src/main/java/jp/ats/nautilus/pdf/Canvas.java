@@ -240,11 +240,6 @@ public class Canvas implements AutoCloseable {
 		}
 	}
 
-	float getFontDescent(Font font, float fontPoint) {
-		return fontCache.get(font.name()).getFontDescriptor().getDescent()
-			/ 100;
-	}
-
 	boolean charExists(Font font, char c) {
 		try {
 			return fontCache.get(font.name()).hasGlyph(c);
