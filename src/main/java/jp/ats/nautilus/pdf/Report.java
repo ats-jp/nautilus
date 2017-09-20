@@ -498,12 +498,18 @@ public class Report implements AutoCloseable {
 		int widthLength,
 		int heightLength,
 		Color color) {
+		LineProcess.OTHER.prepare(current, this);
+
 		float x = (startColumn - 1) * cellWidth;
 		float y = (startLine - 1) * cellHeight;
 		float width = widthLength * cellWidth;
-		float height = heightLength * cellWidth;
+		float height = heightLength * cellHeight;
 
 		canvas.rectangle(x, y, width, height, color);
+	}
+
+	public void fill(Color color) {
+		canvas.fill(color);
 	}
 
 	public void newPage() {

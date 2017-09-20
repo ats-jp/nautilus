@@ -238,11 +238,26 @@ public class Canvas implements AutoCloseable {
 	void rectangle(float x, float y, float width, float height, Color color) {
 		try {
 			currentStream.setNonStrokingColor(color);
-			currentStream.addRect(x, y, width, height);
+
+			currentStream.addRect(startX + x, startY - y, width, height * -1);
 
 			currentStream.fill();
 
-			//矩形描画はここのみなので、ここでしかリセットしない
+			currentStream.setNonStrokingColor(defaultNonStrokingColor);
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
+	}
+
+	void fill(Color color) {
+		try {
+			currentStream.setNonStrokingColor(color);
+
+			currentStream
+				.addRect(0, 0, rectangle.getWidth(), rectangle.getHeight());
+
+			currentStream.fill();
+
 			currentStream.setNonStrokingColor(defaultNonStrokingColor);
 		} catch (IOException e) {
 			throw new DocumentException(e);
