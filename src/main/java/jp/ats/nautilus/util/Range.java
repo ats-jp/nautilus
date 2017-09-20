@@ -8,6 +8,12 @@ public class Range implements Comparable<Range> {
 
 	private static final Charset measureCharset = Charset.forName("MS932");
 
+	private static final ReportDecorator defaultDecorator = (
+		row,
+		column,
+		value,
+		report) -> report.drawText(row, column, 1, 1, value);
+
 	private final int lineIndex;
 
 	private final int from;
@@ -21,6 +27,13 @@ public class Range implements Comparable<Range> {
 		this.from = from;
 		this.to = to;
 		this.decorator = decorator;
+	}
+
+	public Range(int lineIndex, int from, int to) {
+		this.lineIndex = lineIndex;
+		this.from = from;
+		this.to = to;
+		this.decorator = defaultDecorator;
 	}
 
 	public String extractFrom(RestoredPage page) {
@@ -44,7 +57,7 @@ public class Range implements Comparable<Range> {
 			substring(line, alreadyExecutedPosition, from));
 
 		String value = substring(line, from, to);
-		decorator.decorate(lineIndex, from, value, report);
+		decorator.decorate(lineIndex + 1, from + 1, value, report);
 
 		return to;
 	}

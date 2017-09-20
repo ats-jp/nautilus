@@ -5,5 +5,5 @@ import jp.ats.nautilus.pdf.Report;
 @FunctionalInterface
 public interface ReportDecorator {
 
-	void decorate(int lineIndex, int from, String value, Report report);
+	void decorate(int row, int column, String value, Report report);
 }
