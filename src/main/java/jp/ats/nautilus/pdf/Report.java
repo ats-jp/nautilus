@@ -1,11 +1,14 @@
 package jp.ats.nautilus.pdf;
 
 import java.awt.Color;
+import java.nio.CharBuffer;
 
 import org.krysalis.barcode4j.impl.code128.Code128Bean;
 import org.krysalis.barcode4j.impl.code39.Code39Bean;
 import org.krysalis.barcode4j.impl.upcean.EAN13Bean;
 import org.krysalis.barcode4j.impl.upcean.EAN8Bean;
+
+import jp.ats.nautilus.common.Constants;
 
 public class Report implements AutoCloseable {
 
@@ -369,7 +372,7 @@ public class Report implements AutoCloseable {
 		type.line(canvas, x, y, x, y + length * cellHeight);
 	}
 
-	public void drawText(
+	public void drawMixedFontText(
 		int startLine,
 		int startColumn,
 		int horizontalSize,
@@ -377,16 +380,61 @@ public class Report implements AutoCloseable {
 		String text) {
 		LineProcess.OTHER.prepare(current, this);
 
-		canvas.setFontAndSize(font, fontPoint);
+		CharBuffer buffer = CharBuffer.allocate(text.length());
+		boolean isExternalFont = false;
+		int position = startColumn;
+		char[] chars = text.toCharArray();
+		for (int i = 0; i < chars.length; i++) {
+			if (canvas.charExists(externalFont, chars, i)) {
+				if (!isExternalFont && buffer.position() > 0) {
+					position = flushText(
+						font,
+						buffer,
+						startLine,
+						position,
+						horizontalSize,
+						verticalSize);
+				}
 
-		//下線のための上昇分
-		float rise = (cellHeight - fontPoint) * verticalSize;
+				isExternalFont = true;
+				buffer.put(text.charAt(i));
+			} else {
+				if (isExternalFont && buffer.position() > 0) {
+					position = flushText(
+						externalFont,
+						buffer,
+						startLine,
+						position,
+						horizontalSize,
+						verticalSize);
+				}
 
-		canvas.showText(
-			horizontalSize * rateX,
+				isExternalFont = false;
+				buffer.put(text.charAt(i));
+			}
+		}
+
+		flushText(
+			isExternalFont ? externalFont : font,
+			buffer,
+			startLine,
+			position,
+			horizontalSize,
+			verticalSize);
+	}
+
+	public void drawText(
+		int startLine,
+		int startColumn,
+		int horizontalSize,
+		int verticalSize,
+		String text) {
+		drawText(
+			font,
+			startLine,
+			startColumn,
+			horizontalSize,
 			verticalSize,
-			(startColumn - 1) * cellWidth,
-			(startLine + verticalSize - 1) * cellHeight - rise,
 			text);
 	}
 
@@ -410,8 +458,10 @@ public class Report implements AutoCloseable {
 		//外字フォント内に制御文字や空白などが含まれていない場合
 		//非表示となってしまうため、先頭だけでもずらすための処置
 		int invisibleCharactersOffset = 0;
-		for (char c : text.toCharArray()) {
-			if (!canvas.charExists(externalFont, c)) {
+
+		char[] chars = text.toCharArray();
+		for (int i = 0; i < chars.length; i++) {
+			if (!canvas.charExists(externalFont, chars, i)) {
 				invisibleCharactersOffset++;
 			} else {
 				break;
@@ -530,13 +580,57 @@ public class Report implements AutoCloseable {
 
 	public boolean containsExternalFont(String text) {
 		if (externalFont == null) return false;
+		return canvas.charExists(externalFont, text);
+	}
 
-		char[] chars = text.toCharArray();
-		for (char c : chars) {
-			if (canvas.charExists(externalFont, c)) return true;
-		}
+	private int flushText(
+		Font font,
+		CharBuffer buffer,
+		int startLine,
+		int startColumn,
+		int horizontalSize,
+		int verticalSize) {
+		char[] chars = new char[buffer.position()];
+		buffer.flip();
+		buffer.get(chars);
+		buffer.clear();
+		String text = new String(chars);
+		int length = text.getBytes(Constants.MEASURE_CHARSET).length;
+		drawText(
+			font,
+			startLine,
+			startColumn,
+			horizontalSize,
+			verticalSize,
+			text);
 
-		return false;
+		return startColumn + length;
+	}
+
+	private void drawText(
+		Font font,
+		int startLine,
+		int startColumn,
+		int horizontalSize,
+		int verticalSize,
+		String text) {
+		LineProcess.OTHER.prepare(current, this);
+
+		canvas.saveState();
+
+		canvas.setFontAndSize(font, fontPoint);
+
+		//下線のための上昇分
+		float rise = (cellHeight - fontPoint) * verticalSize;
+
+		canvas.showText(
+			horizontalSize * rateX,
+			verticalSize,
+			(startColumn - 1) * cellWidth,
+			(startLine + verticalSize - 1) * cellHeight - rise,
+			text);
+
+		canvas.restoreState();
 	}
 
 	private void startLineDraw(float lineWidth) {

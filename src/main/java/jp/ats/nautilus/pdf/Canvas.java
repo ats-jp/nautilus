@@ -156,13 +156,7 @@ public class Canvas implements AutoCloseable {
 	}
 
 	void setFontAndSize(Font font, float size) {
-		String name = font.name();
-		PDType0Font pdFont = fontCache.get(name);
-
-		if (pdFont == null) {
-			pdFont = font.createPDFont(document);
-			fontCache.put(name, pdFont);
-		}
+		PDType0Font pdFont = cacheFont(font);
 
 		try {
 			currentStream.setFont(pdFont, size);
@@ -272,12 +266,25 @@ public class Canvas implements AutoCloseable {
 		}
 	}
 
-	boolean charExists(Font font, char c) {
-		try {
-			return fontCache.get(font.name()).hasGlyph(c);
-		} catch (IOException e) {
-			throw new DocumentException(e);
+	boolean charExists(Font font, String text) {
+		char[] chars = text.toCharArray();
+		for (int i = 0; i < chars.length; i++) {
+			if (charExists(font, chars, i)) return true;
 		}
+
+		return false;
+	}
+
+	boolean charExists(Font font, char[] chars, int index) {
+		char c = chars[index];
+
+		if (Character.isSurrogate(c)) throw new UnsupportedOperationException(
+			"char " + ((int) c) + " is surrogate.");
+
+		PDType0Font pdFont = fontCache.get(font.name());
+		if (pdFont == null) pdFont = cacheFont(font);
+
+		return font.hasGryph(c);
 	}
 
 	void setTemplateDocument(Template template) {
@@ -332,11 +339,11 @@ public class Canvas implements AutoCloseable {
 		}
 	}
 
-	public int getNumberOfPages() {
+	int getNumberOfPages() {
 		return document.getNumberOfPages();
 	}
 
-	public void save() {
+	void save() {
 		try {
 			if (currentStream != null) {
 				currentStream.close();
@@ -381,6 +388,18 @@ public class Canvas implements AutoCloseable {
 
 	float getCPI() {
 		return cpi;
+	}
+
+	private PDType0Font cacheFont(Font font) {
+		String name = font.name();
+		PDType0Font pdFont = fontCache.get(name);
+
+		if (pdFont == null) {
+			pdFont = font.createPDFont(document);
+			fontCache.put(name, pdFont);
+		}
+
+		return pdFont;
 	}
 
 	private PDPage cloneTemplatePage() {

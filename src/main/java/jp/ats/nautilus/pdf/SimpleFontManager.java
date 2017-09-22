@@ -4,6 +4,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.fontbox.ttf.CmapSubtable;
+
 public class SimpleFontManager extends FontManager {
 
 	@Override
@@ -18,6 +20,11 @@ public class SimpleFontManager extends FontManager {
 			@Override
 			protected String name() {
 				return "MS-Mincho";
+			}
+
+			@Override
+			protected CmapSubtable createCmap() {
+				return null;
 			}
 		};
 	}

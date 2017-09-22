@@ -2,11 +2,12 @@ package jp.ats.nautilus.util;
 
 import java.nio.charset.Charset;
 
+import jp.ats.nautilus.common.Constants;
 import jp.ats.nautilus.pdf.Report;
 
 public class Range implements Comparable<Range> {
 
-	private static final Charset measureCharset = Charset.forName("MS932");
+	private static final Charset charset = Constants.MEASURE_CHARSET;
 
 	private static final ReportDecorator defaultDecorator = (
 		row,
@@ -63,18 +64,18 @@ public class Range implements Comparable<Range> {
 	}
 
 	public static String substring(String source, int from, int to) {
-		return substringInternal(source.getBytes(measureCharset), from, to);
+		return substringInternal(source.getBytes(charset), from, to);
 	}
 
 	public static String substring(String source, int from) {
-		byte[] bytes = source.getBytes(measureCharset);
+		byte[] bytes = source.getBytes(charset);
 		return substringInternal(bytes, from, bytes.length);
 	}
 
 	private static String substringInternal(byte[] bytes, int from, int to) {
 		byte[] dest = new byte[to - from];
 		System.arraycopy(bytes, from, dest, 0, dest.length);
-		return new String(dest, measureCharset);
+		return new String(dest, charset);
 	}
 
 	@Override
