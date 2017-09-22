@@ -9,11 +9,29 @@ public class Range implements Comparable<Range> {
 
 	private static final Charset charset = Constants.MEASURE_CHARSET;
 
-	private static final ReportDecorator defaultDecorator = (
-		row,
-		column,
-		value,
-		report) -> report.drawText(row, column, 1, 1, value);
+	private static final ReportDecorator defaultDecorator = new ReportDecorator() {
+
+		@Override
+		public void decorate(int row, int column, String value, Report report) {
+			report.drawText(row, column, 1, 1, value);
+		}
+
+		@Override
+		public void drawBeforeRange(
+			int startLine,
+			int startColumn,
+			int horizontalSize,
+			int verticalSize,
+			String text,
+			Report report) {
+			report.drawText(
+				startLine,
+				startColumn,
+				horizontalSize,
+				verticalSize,
+				text);
+		}
+	};
 
 	private final int lineIndex;
 
@@ -50,12 +68,13 @@ public class Range implements Comparable<Range> {
 		Report report) {
 		if (this.lineIndex != lineIndex) return alreadyExecutedPosition;
 
-		report.drawText(
+		decorator.drawBeforeRange(
 			lineIndex + 1,
 			alreadyExecutedPosition + 1,
 			1,
 			1,
-			substring(line, alreadyExecutedPosition, from));
+			substring(line, alreadyExecutedPosition, from),
+			report);
 
 		String value = substring(line, from, to);
 		decorator.decorate(lineIndex + 1, from + 1, value, report);
