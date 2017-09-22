@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.fontbox.ttf.CmapSubtable;
-import org.apache.fontbox.ttf.TTFParser;
 import org.apache.fontbox.ttf.TrueTypeCollection;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
@@ -52,9 +51,9 @@ public abstract class Font {
 	}
 
 	protected CmapSubtable createCmap() {
-		try {
-			return new TTFParser().parse(new ByteArrayInputStream(source))
-				.getUnicodeCmap(false);
+		try (TrueTypeCollection collection = new TrueTypeCollection(
+			new ByteArrayInputStream(source))) {
+			return collection.getFontByName(name()).getUnicodeCmap();
 		} catch (IOException e) {
 			throw new DocumentException(e);
 		}
