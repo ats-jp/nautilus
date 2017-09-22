@@ -7,6 +7,7 @@ import java.io.InputStream;
 
 import org.apache.fontbox.ttf.CmapSubtable;
 import org.apache.fontbox.ttf.TrueTypeCollection;
+import org.apache.fontbox.ttf.TrueTypeFont;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
@@ -27,7 +28,7 @@ public abstract class Font {
 			throw new DocumentException(e);
 		}
 
-		cmap = createCmap();
+		cmap = getCmap();
 	}
 
 	public boolean hasGryph(int codePoint) {
@@ -41,19 +42,16 @@ public abstract class Font {
 	}
 
 	protected PDType0Font createPDFont(PDDocument document) {
-		try (TrueTypeCollection collection = new TrueTypeCollection(
-			new ByteArrayInputStream(source))) {
-			return PDType0Font
-				.load(document, collection.getFontByName(name()), true);
+		try {
+			return PDType0Font.load(document, trueTypeFont(), true);
 		} catch (IOException e) {
 			throw new DocumentException(e);
 		}
 	}
 
-	protected CmapSubtable createCmap() {
-		try (TrueTypeCollection collection = new TrueTypeCollection(
-			new ByteArrayInputStream(source))) {
-			return collection.getFontByName(name()).getUnicodeCmap();
+	protected CmapSubtable getCmap() {
+		try {
+			return trueTypeFont().getUnicodeCmap();
 		} catch (IOException e) {
 			throw new DocumentException(e);
 		}
@@ -62,4 +60,11 @@ public abstract class Font {
 	protected abstract InputStream load() throws IOException;
 
 	protected abstract String name();
+
+	private TrueTypeFont trueTypeFont() throws IOException {
+		try (TrueTypeCollection collection = new TrueTypeCollection(
+			new ByteArrayInputStream(source))) {
+			return collection.getFontByName(name());
+		}
+	}
 }

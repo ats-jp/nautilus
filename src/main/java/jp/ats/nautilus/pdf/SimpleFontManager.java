@@ -23,7 +23,7 @@ public class SimpleFontManager extends FontManager {
 			}
 
 			@Override
-			protected CmapSubtable createCmap() {
+			protected CmapSubtable getCmap() {
 				return null;
 			}
 		};
