@@ -1,34 +1,25 @@
 package jp.ats.nautilus.pdf;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.fontbox.ttf.CmapSubtable;
+import org.apache.fontbox.ttf.TTFParser;
 import org.apache.fontbox.ttf.TrueTypeCollection;
 import org.apache.fontbox.ttf.TrueTypeFont;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
-import jp.ats.nautilus.common.U;
-
 public abstract class Font {
 
-	private final byte[] source;
+	private final TrueTypeFont font;
 
 	private final CmapSubtable cmap;
 
 	public Font() {
-		try {
-			try (InputStream input = new BufferedInputStream(load())) {
-				source = U.readBytes(input);
-			}
-		} catch (IOException e) {
-			throw new DocumentException(e);
-		}
-
-		cmap = getCmap();
+		font = trueTypeFont();
+		cmap = cmap();
 	}
 
 	public boolean hasGryph(int codePoint) {
@@ -37,34 +28,42 @@ public abstract class Font {
 		return cmap.getGlyphId(codePoint) != 0;
 	}
 
-	protected byte[] source() {
-		return source;
-	}
-
 	protected PDType0Font createPDFont(PDDocument document) {
 		try {
-			return PDType0Font.load(document, trueTypeFont(), true);
+			return PDType0Font.load(document, font, true);
 		} catch (IOException e) {
 			throw new DocumentException(e);
 		}
 	}
 
-	protected CmapSubtable getCmap() {
+	protected CmapSubtable cmap() {
 		try {
-			return trueTypeFont().getUnicodeCmap();
+			return font.getUnicodeCmap();
 		} catch (IOException e) {
 			throw new DocumentException(e);
 		}
 	}
+
+	protected abstract TrueTypeFont trueTypeFont();
 
 	protected abstract InputStream load() throws IOException;
 
 	protected abstract String name();
 
-	private TrueTypeFont trueTypeFont() throws IOException {
+	protected TrueTypeFont parseFontInCollection() {
 		try (TrueTypeCollection collection = new TrueTypeCollection(
-			new ByteArrayInputStream(source))) {
+			new BufferedInputStream(load()))) {
 			return collection.getFontByName(name());
+		} catch (IOException e) {
+			throw new DocumentException(e);
+		}
+	}
+
+	protected TrueTypeFont parseFont() {
+		try (InputStream input = new BufferedInputStream(load())) {
+			return new TTFParser().parse(input);
+		} catch (IOException e) {
+			throw new DocumentException(e);
 		}
 	}
 }

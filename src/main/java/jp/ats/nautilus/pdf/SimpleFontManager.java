@@ -4,7 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.fontbox.ttf.CmapSubtable;
+import org.apache.fontbox.ttf.TrueTypeFont;
 
 public class SimpleFontManager extends FontManager {
 
@@ -23,8 +23,8 @@ public class SimpleFontManager extends FontManager {
 			}
 
 			@Override
-			protected CmapSubtable getCmap() {
-				return null;
+			protected TrueTypeFont trueTypeFont() {
+				return parseFontInCollection();
 			}
 		};
 	}
