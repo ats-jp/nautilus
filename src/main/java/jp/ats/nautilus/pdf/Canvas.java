@@ -156,7 +156,7 @@ public class Canvas implements AutoCloseable {
 	}
 
 	void setFontAndSize(Font font, float size) {
-		PDType0Font pdFont = cacheFont(font);
+		PDType0Font pdFont = prepareFont(font);
 
 		try {
 			currentStream.setFont(pdFont, size);
@@ -282,7 +282,7 @@ public class Canvas implements AutoCloseable {
 			"char " + ((int) c) + " is surrogate.");
 
 		PDType0Font pdFont = fontCache.get(font.name());
-		if (pdFont == null) pdFont = cacheFont(font);
+		if (pdFont == null) pdFont = prepareFont(font);
 
 		return font.hasGryph(c);
 	}
@@ -390,7 +390,7 @@ public class Canvas implements AutoCloseable {
 		return cpi;
 	}
 
-	private PDType0Font cacheFont(Font font) {
+	private PDType0Font prepareFont(Font font) {
 		String name = font.name();
 		PDType0Font pdFont = fontCache.get(name);
 

@@ -26,11 +26,6 @@ public class SimpleFontManager extends FontManager {
 			protected TrueTypeFont trueTypeFont() {
 				return parseFontInCollection();
 			}
-
-			@Override
-			protected boolean hasAllGryphs() {
-				return true;
-			}
 		};
 	}
 

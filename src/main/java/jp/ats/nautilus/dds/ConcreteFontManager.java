@@ -47,11 +47,6 @@ public class ConcreteFontManager extends FontManager {
 			protected TrueTypeFont trueTypeFont() {
 				return parseFontInCollection();
 			}
-
-			@Override
-			protected boolean hasAllGryphs() {
-				return true;
-			}
 		};
 
 		externalFont = new Font() {
@@ -69,11 +64,6 @@ public class ConcreteFontManager extends FontManager {
 			@Override
 			protected TrueTypeFont trueTypeFont() {
 				return parseFont();
-			}
-
-			@Override
-			protected boolean hasAllGryphs() {
-				return false;
 			}
 		};
 	}
