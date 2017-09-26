@@ -580,7 +580,13 @@ public class Report implements AutoCloseable {
 
 	public boolean containsExternalFont(String text) {
 		if (externalFont == null) return false;
-		return canvas.charExists(externalFont, text);
+
+		char[] chars = text.toCharArray();
+		for (int i = 0; i < chars.length; i++) {
+			if (canvas.charExists(font, chars, i)) return true;
+		}
+
+		return false;
 	}
 
 	private int flushText(

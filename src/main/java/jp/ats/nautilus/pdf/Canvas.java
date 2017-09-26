@@ -266,23 +266,13 @@ public class Canvas implements AutoCloseable {
 		}
 	}
 
-	boolean charExists(Font font, String text) {
-		char[] chars = text.toCharArray();
-		for (int i = 0; i < chars.length; i++) {
-			if (charExists(font, chars, i)) return true;
-		}
-
-		return false;
-	}
-
 	boolean charExists(Font font, char[] chars, int index) {
 		char c = chars[index];
 
 		if (Character.isSurrogate(c)) throw new UnsupportedOperationException(
 			"char " + ((int) c) + " is surrogate.");
 
-		PDType0Font pdFont = fontCache.get(font.name());
-		if (pdFont == null) pdFont = prepareFont(font);
+		prepareFont(font);
 
 		return font.hasGryph(c);
 	}

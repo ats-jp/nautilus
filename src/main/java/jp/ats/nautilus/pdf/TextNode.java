@@ -41,7 +41,7 @@ class TextNode extends Node {
 	@Override
 	void draw(Report report) {
 		if (report.containsExternalFont(text)) {
-			report.drawExternalFontText(
+			report.drawMixedFontText(
 				row,
 				column,
 				horizontalSize,
