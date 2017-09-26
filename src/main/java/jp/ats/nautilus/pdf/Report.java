@@ -438,7 +438,7 @@ public class Report implements AutoCloseable {
 			text);
 	}
 
-	public void drawExternalFontText(
+	public void drawExternalFontOnlyText(
 		int startLine,
 		int startColumn,
 		int horizontalSize,
