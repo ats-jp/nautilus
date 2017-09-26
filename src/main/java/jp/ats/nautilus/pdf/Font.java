@@ -19,12 +19,15 @@ public abstract class Font {
 
 	public Font() {
 		font = trueTypeFont();
-		cmap = cmap();
+		if (!hasAllGryphs()) {
+			cmap = cmap();
+		} else {
+			cmap = null;
+		}
 	}
 
 	public boolean hasGryph(int codePoint) {
-		if (cmap == null) throw new UnsupportedOperationException();
-
+		if (hasAllGryphs()) throw new UnsupportedOperationException();
 		return cmap.getGlyphId(codePoint) != 0;
 	}
 
@@ -49,6 +52,8 @@ public abstract class Font {
 	protected abstract InputStream load() throws IOException;
 
 	protected abstract String name();
+
+	protected abstract boolean hasAllGryphs();
 
 	protected TrueTypeFont parseFontInCollection() {
 		try (TrueTypeCollection collection = new TrueTypeCollection(

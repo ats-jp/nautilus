@@ -47,13 +47,18 @@ public class ConcreteFontManager extends FontManager {
 			protected TrueTypeFont trueTypeFont() {
 				return parseFontInCollection();
 			}
+
+			@Override
+			protected boolean hasAllGryphs() {
+				return true;
+			}
 		};
 
 		externalFont = new Font() {
 
 			@Override
 			protected InputStream load() throws IOException {
-				return new FileInputStream(fontDirectory + "EUDC.TTF");
+				return new FileInputStream(fontDirectory + "EUDC.TTE");
 			}
 
 			@Override
@@ -64,6 +69,11 @@ public class ConcreteFontManager extends FontManager {
 			@Override
 			protected TrueTypeFont trueTypeFont() {
 				return parseFont();
+			}
+
+			@Override
+			protected boolean hasAllGryphs() {
+				return false;
 			}
 		};
 	}
