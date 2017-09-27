@@ -1,19 +1,12 @@
 package jp.ats.nautilus.common;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -87,10 +80,6 @@ public class U {
 
 	public static final int BUFFER_SIZE = 8192;
 
-	private static final int hashCodeBase = 17;
-
-	private static final int hashCodeSugar = 37;
-
 	private static final Map<String, Class<?>> primitiveTypeMap = new HashMap<>();
 
 	private static final Map<Class<?>, Class<?>> primitiveToWrapperMap = new HashMap<>();
@@ -156,32 +145,6 @@ public class U {
 	}
 
 	private U() {}
-
-	public static int sumHashCodes(int[] hashCodes) {
-		int result = hashCodeBase;
-		for (int hashCode : hashCodes)
-			result = hashCodeSugar * result + hashCode;
-		return result;
-	}
-
-	public static int sumHashCodes(Object[] members) {
-		int result = hashCodeBase;
-		for (Object member : members)
-			result = hashCodeSugar * result
-				+ (member == null ? 0 : member.hashCode());
-		return result;
-	}
-
-	public static int sumHashCodes(Collection<?> members) {
-		return sumHashCodes(members.toArray(new Object[members.size()]));
-	}
-
-	public static int sumHashCodesOf(int... hashCodes) {
-		int result = hashCodeBase;
-		for (int hashCode : hashCodes)
-			result = hashCodeSugar * result + hashCode;
-		return result;
-	}
 
 	public static boolean equals(Object[] objects, Object[] others) {
 		if (objects == null && others == null) return true;
@@ -272,15 +235,6 @@ public class U {
 	}
 
 	/**
-	 * 指定されたオブジェクトと同パッケージで同クラス名のファイルのパスを返します。
-	 * @param resourceBase リソースファイルと同パッケージで同名のクラスのオブジェクト
-	 * @param extension ロードするファイルの拡張子
-	 */
-	public static URL getResourcePath(Object resourceBase, String extension) {
-		return getResourcePath(resourceBase.getClass(), extension);
-	}
-
-	/**
 	 * 指定されたクラスと同パッケージで同名のファイルのパスを返します。
 	 * @param resourceBase リソースファイルと同パッケージで同名のクラス
 	 * @param extension ロードするファイルの拡張子
@@ -291,17 +245,6 @@ public class U {
 			+ "."
 			+ extension;
 		return U.class.getResource(path);
-	}
-
-	/**
-	 * 指定されたオブジェクトと同パッケージで指定された名前のファイルのパスを返します。
-	 * @param resourceBase リソースファイルと同パッケージ
-	 * @param fileName ロードするファイル名
-	 */
-	public static URL getResourcePathByName(
-		Object resourceBase,
-		String fileName) {
-		return getResourcePathByName(resourceBase.getClass(), fileName);
 	}
 
 	/**
@@ -1375,24 +1318,6 @@ public class U {
 		return boxed;
 	}
 
-	public static void close(Closeable object) {
-		if (object == null) return;
-		try {
-			object.close();
-		} catch (IOException e) {
-			throw new CloseFailedException(e);
-		}
-	}
-
-	public static void flush(Flushable object) {
-		if (object == null) return;
-		try {
-			object.flush();
-		} catch (IOException e) {
-			throw new CloseFailedException(e);
-		}
-	}
-
 	/**
 	 * このストリームから読み込めるだけ読み込み、byte 配列として返します。
 	 */
@@ -1439,10 +1364,13 @@ public class U {
 				if (total == 0) {
 					return -1;
 				}
+
 				return total;
 			}
+
 			total += readed;
 		}
+
 		return total;
 	}
 
@@ -1456,149 +1384,25 @@ public class U {
 		while ((readed = in.read(b, 0, BUFFER_SIZE)) > 0) {
 			out.write(b, 0, readed);
 		}
+
 		out.flush();
 	}
 
-	/**
-	 * このストリームから読み込めるだけ読み込み、char 配列として返します。
-	 */
-	public static char[] readChars(Reader in) throws IOException {
-		char[] concat = CHAR_EMPTY_ARRAY;
-		char[] b = new char[BUFFER_SIZE];
-		int readed;
-		while ((readed = in.read(b, 0, BUFFER_SIZE)) > 0) {
-			concat = concatCharArray(concat, concat.length, b, readed);
-		}
-		return concat;
-	}
-
-	/**
-	 * in から buffer サイズ分を buffer に読み込みます。
-	 * 読み込み途中でストリームの終わりに達した場合、そこまでに読み込まれた
-	 * 文字数を返します。
-	 * @param in 入力ストリーム
-	 * @param buffer データ格納用バッファ
-	 * @return バッファに読み込まれた文字の合計数。ストリームの終わりに達してデータがない場合は -1
-	 * @throws IOException
-	 */
-	public static int readChars(Reader in, char[] buffer) throws IOException {
-		return readChars(in, buffer, buffer.length);
-	}
-
-	/**
-	 * in から指定された size 分を buffer に読み込みます。
-	 * 読み込み途中でストリームの終わりに達した場合、そこまでに読み込まれた
-	 * 文字数を返します。
-	 * @param in 入力ストリーム
-	 * @param buffer データ格納用バッファ
-	 * @param size 読み込み要求サイズ
-	 * @return バッファに読み込まれた文字の合計数。ストリームの終わりに達してデータがない場合は -1
-	 * @throws IOException
-	 */
-	public static int readChars(Reader in, char[] buffer, int size)
-		throws IOException {
-		int total = 0;
-		while (total < size) {
-			int readed = in.read(buffer, total, size - total);
-			if (readed == -1) {
-				if (total == 0) {
-					return -1;
-				}
-				return total;
-			}
-			total += readed;
-		}
-		return total;
-	}
-
-	/**
-	 * in から読み込めるだけ読み込み、out へ出力します。
-	 */
-	public static void sendChars(Reader in, Writer out) throws IOException {
-		char[] b = new char[BUFFER_SIZE];
-		int readed;
-		while ((readed = in.read(b, 0, BUFFER_SIZE)) > 0) {
-			out.write(b, 0, readed);
-		}
-		out.flush();
-	}
-
-	/**
-	 * クラスをロードするために使用される検索パスから、指定された名前のリソースをファイルとして取得します。
-	 * このメソッドは実ファイルを対象とする場合のみ有効です。
-	 *
-	 * @param resource リソースの名前
-	 * @return リソースに対応する {@link File} オブジェクト。リソースが見つからなかった場合は null
-	 */
-	public static File getResourceAsFile(String resource) {
-		return getResourceAsFile(U.class.getResource(resource));
-	}
-
-	/**
-	 * {@link URL} として指定されたリソースをファイルとして取得します。
-	 * このメソッドは実ファイルを対象とする場合のみ有効です。
-	 *
-	 * @param resource リソースの {@link URL}
-	 * @return リソースに対応する {@link File} オブジェクト。リソースが見つからなかった場合は null
-	 */
-	public static File getResourceAsFile(URL resource) {
-		if (resource == null) return null;
-
-		Matcher matcher = Pattern.compile("^file:(.*)$")
-			.matcher(resource.toString());
-		if (matcher.find()) {
-			try {
-				return new File(URLDecoder.decode(matcher.group(1), "UTF-8"));
-			} catch (UnsupportedEncodingException e) {
-				throw new Error(e);
-			}
-		}
-		return null;
-	}
-
-	public static Iterable<String> createLineIterable(final Reader in) {
-		final Iterator<String> iterator = createLineIterator(in);
-		return new Iterable<String>() {
-
-			@Override
-			public Iterator<String> iterator() {
-				return iterator;
-			}
-		};
-	}
-
-	public static Iterator<String> createLineIterator(Reader in) {
-		return new LineIterator(new BufferedReader(in));
-	}
-
-	public static void copy(File src, File dest) throws IOException {
-		InputStream input = null;
-		OutputStream output = null;
+	public static void close(Closeable object) {
+		if (object == null) return;
 		try {
-			input = new BufferedInputStream(new FileInputStream(src));
+			object.close();
+		} catch (IOException e) {
+			throw new CloseFailedException(e);
+		}
+	}
 
-			if (!dest.exists()) dest.createNewFile();
-			output = new BufferedOutputStream(new FileOutputStream(dest));
-
-			sendBytes(input, output);
-		} finally {
-			String message = "";
-			boolean occurred = false;
-			try {
-				close(input);
-			} catch (CloseFailedException e) {
-				message += e.getMessage();
-				occurred = true;
-			}
-
-			try {
-				close(output);
-			} catch (CloseFailedException e) {
-				message += e.getMessage();
-				occurred = true;
-			}
-
-			if (occurred) throw new CloseFailedException(message);
+	public static void flush(Flushable object) {
+		if (object == null) return;
+		try {
+			object.flush();
+		} catch (IOException e) {
+			throw new CloseFailedException(e);
 		}
 	}
 
@@ -1912,37 +1716,6 @@ public class U {
 			return instance;
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
-		}
-	}
-
-	private static class LineIterator implements Iterator<String> {
-
-		private final BufferedReader reader;
-
-		private String line;
-
-		private LineIterator(BufferedReader reader) {
-			this.reader = reader;
-		}
-
-		@Override
-		public boolean hasNext() {
-			try {
-				line = reader.readLine();
-			} catch (IOException e) {
-				throw new IllegalStateException(e);
-			}
-			return line != null;
-		}
-
-		@Override
-		public String next() {
-			return line;
-		}
-
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
 		}
 	}
 

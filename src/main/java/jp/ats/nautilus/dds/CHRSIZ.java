@@ -1,10 +1,9 @@
 package jp.ats.nautilus.dds;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import jp.ats.nautilus.common.U;
 
 public class CHRSIZ extends ConditionHolder {
 
@@ -53,6 +52,6 @@ public class CHRSIZ extends ConditionHolder {
 
 	@Override
 	public int hashCode() {
-		return U.sumHashCodes(new int[] { horizontalSize, verticalSize });
+		return Objects.hash(horizontalSize, verticalSize);
 	}
 }
