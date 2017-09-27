@@ -61,6 +61,6 @@ public class ReportContext {
 		String field = fieldHolder.get();
 		if (U.presents(field)) buffer.add("field:[" + field + "]");
 
-		return U.join(buffer, " ");
+		return String.join(" ", buffer);
 	}
 }

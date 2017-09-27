@@ -1,5 +1,7 @@
 package jp.ats.nautilus.common;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.Flushable;
@@ -221,17 +223,34 @@ public class U {
 		return care(target).trim();
 	}
 
-	public static String[] care(String[] target) {
-		String[] clone = target.clone();
-		for (int i = 0; i < clone.length; i++) {
-			clone[i] = care(clone[i]);
-		}
+	public static String removeWhiteSpaces(String target) {
+		return care(target).replaceAll("^\\s+|\\s+$", "");
+	}
 
-		return clone;
+	public static int getNewLineChoppedLength(byte[] buffer, int lastIndex) {
+		byte b;
+		while (lastIndex > 0
+			&& ((b = buffer[lastIndex - 1]) == '\n' || b == '\r'))
+			lastIndex--;
+
+		return lastIndex;
 	}
 
 	public static boolean presents(String value) {
 		return value != null && !value.equals("");
+	}
+
+	public static <T> T getInstance(String className) {
+		try {
+			Class<?> clazz = Class.forName(className);
+
+			@SuppressWarnings("unchecked")
+			T instance = (T) clazz.newInstance();
+
+			return instance;
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	/**
@@ -244,21 +263,6 @@ public class U {
 			+ resourceBase.getName().replace('.', '/')
 			+ "."
 			+ extension;
-		return U.class.getResource(path);
-	}
-
-	/**
-	 * 指定されたクラスと同パッケージで指定された名前のファイルのパスを返します。
-	 * @param resourceBase リソースファイルと同パッケージ
-	 * @param fileName ロードするファイル名
-	 */
-	public static URL getResourcePathByName(
-		Class<?> resourceBase,
-		String fileName) {
-		String path = "/"
-			+ resourceBase.getPackage().getName().replace('.', '/')
-			+ "/"
-			+ fileName;
 		return U.class.getResource(path);
 	}
 
@@ -306,54 +310,8 @@ public class U {
 				.replaceAll("!" + relativeLocation + "$", ""));
 	}
 
-	public static <T> Enumeration<T> getMapKeys(Map<T, ?> map) {
-		return toEnumeration(map.keySet().iterator());
-	}
-
-	public static <T> Enumeration<T> getElements(List<T> list) {
-		return toEnumeration(list.iterator());
-	}
-
 	public static <T> Iterable<T> iterable(final Iterator<T> iterator) {
-		return new Iterable<T>() {
-
-			@Override
-			public Iterator<T> iterator() {
-				return iterator;
-			}
-		};
-	}
-
-	public static String join(String separator, Object... values) {
-		return join(values, separator);
-	}
-
-	public static String join(Object[] values, String separator) {
-		if (values.length == 0) return "";
-		StringBuffer buffer = new StringBuffer();
-		for (Object value : values) {
-			buffer.append(separator);
-			buffer.append(value);
-		}
-
-		String joined = buffer.toString();
-		if (joined.length() == 0) return joined;
-
-		return joined.substring(separator.length());
-	}
-
-	public static String join(Collection<?> values, String separator) {
-		if (values.size() == 0) return "";
-		StringBuffer buffer = new StringBuffer();
-		for (Object value : values) {
-			buffer.append(separator);
-			buffer.append(value);
-		}
-
-		String joined = buffer.toString();
-		if (joined.length() == 0) return joined;
-
-		return joined.substring(separator.length());
+		return () -> iterator;
 	}
 
 	public static <T> Enumeration<T> toEnumeration(final Iterator<T> i) {
@@ -1316,6 +1274,13 @@ public class U {
 		}
 
 		return boxed;
+	}
+
+	public static InputStream wrap(InputStream input) {
+		if (!(input instanceof BufferedInputStream)
+			|| !(input instanceof ByteArrayInputStream))
+			return new BufferedInputStream(input);
+		return input;
 	}
 
 	/**
