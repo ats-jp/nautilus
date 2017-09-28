@@ -1,6 +1,5 @@
 package jp.ats.nautilus.dds;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Consumer;
@@ -39,7 +38,7 @@ public class HostResource {
 
 	public void read(Consumer<byte[]> consumer) {
 		byte[] buffer = new byte[length];
-		try (InputStream input = new BufferedInputStream(open())) {
+		try (InputStream input = U.wrap(open())) {
 			int readed;
 			while ((readed = input.read(buffer)) == length) {
 				consumer.accept(buffer);

@@ -1,7 +1,6 @@
 package jp.ats.nautilus.dds;
 
 import java.beans.PropertyVetoException;
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -169,7 +168,7 @@ public class HostUtilities {
 		PrintWriter writer,
 		boolean addsShiftChars) {
 		byte[] buffer = new byte[resource.length];
-		try (InputStream input = new BufferedInputStream(resource.open())) {
+		try (InputStream input = U.wrap(resource.open())) {
 			int readed;
 			while ((readed = input.read(buffer)) == resource.length) {
 				String lineString = convertLine(buffer, addsShiftChars);
@@ -188,7 +187,7 @@ public class HostUtilities {
 		Consumer<String> lineConsumer,
 		boolean addsShiftChars) {
 		byte[] buffer = new byte[resource.length];
-		try (InputStream input = new BufferedInputStream(resource.open())) {
+		try (InputStream input = U.wrap(resource.open())) {
 			int readed;
 			while ((readed = input.read(buffer)) == resource.length) {
 				String lineString = convertLine(buffer, addsShiftChars);

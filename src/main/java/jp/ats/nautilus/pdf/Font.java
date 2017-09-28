@@ -1,6 +1,5 @@
 package jp.ats.nautilus.pdf;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -10,6 +9,8 @@ import org.apache.fontbox.ttf.TrueTypeCollection;
 import org.apache.fontbox.ttf.TrueTypeFont;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+
+import jp.ats.nautilus.common.U;
 
 public abstract class Font {
 
@@ -51,7 +52,7 @@ public abstract class Font {
 
 	protected TrueTypeFont parseFontInCollection() {
 		try (TrueTypeCollection collection = new TrueTypeCollection(
-			new BufferedInputStream(load()))) {
+			U.wrap(load()))) {
 			return collection.getFontByName(name());
 		} catch (IOException e) {
 			throw new DocumentException(e);
@@ -59,7 +60,7 @@ public abstract class Font {
 	}
 
 	protected TrueTypeFont parseFont() {
-		try (InputStream input = new BufferedInputStream(load())) {
+		try (InputStream input = U.wrap(load())) {
 			return new TTFParser().parse(input);
 		} catch (IOException e) {
 			throw new DocumentException(e);

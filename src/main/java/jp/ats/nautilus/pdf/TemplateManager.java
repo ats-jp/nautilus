@@ -1,6 +1,5 @@
 package jp.ats.nautilus.pdf;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,9 +22,7 @@ public class TemplateManager {
 			Template template = templateCache.get(pdfFile);
 			if (template == null) {
 				template = new Template(
-					U.readBytes(
-						new BufferedInputStream(
-							Files.newInputStream(pdfFile))));
+					U.readBytes(U.wrap(Files.newInputStream(pdfFile))));
 				templateCache.put(pdfFile, template);
 			}
 
