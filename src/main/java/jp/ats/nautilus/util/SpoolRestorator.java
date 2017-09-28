@@ -8,12 +8,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.ibm.as400.access.AS400SecurityException;
-
 import jp.ats.nautilus.common.CP932;
-import jp.ats.nautilus.dds.AS400Handler;
-import jp.ats.nautilus.dds.AS400Resource;
-import jp.ats.nautilus.dds.AS400Utilities;
+import jp.ats.nautilus.dds.HostHandler;
+import jp.ats.nautilus.dds.HostResource;
+import jp.ats.nautilus.dds.HostUtilities;
 
 public class SpoolRestorator {
 
@@ -24,20 +22,16 @@ public class SpoolRestorator {
 	private int currentPosition = 0;
 
 	public void restore(
-		AS400Handler handler,
+		HostHandler handler,
 		Consumer<RestoredPage> pageConsumer)
 		throws InterruptedException {
-		AS400Resource resource = handler.getResource();
-		try {
-			resource.read(bytes -> {
-				String line = CP932
-					.treatForCP932(AS400Utilities.convertLine(bytes, true));
+		HostResource resource = handler.getResource();
+		resource.read(bytes -> {
+			String line = CP932
+				.treatForCP932(HostUtilities.convertLine(bytes, true));
 
-				accept(line, pageConsumer);
-			});
-		} catch (IOException | AS400SecurityException e) {
-			throw new IllegalStateException(e);
-		}
+			accept(line, pageConsumer);
+		});
 
 		finish(pageConsumer);
 	}

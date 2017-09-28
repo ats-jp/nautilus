@@ -21,7 +21,7 @@ import com.ibm.as400.access.SequentialFile;
 import jp.ats.nautilus.common.CP932;
 import jp.ats.nautilus.common.U;
 
-public class AS400Utilities {
+public class HostUtilities {
 
 	public static final Charset CHARSET = Charset.forName("CP930");
 
@@ -29,13 +29,12 @@ public class AS400Utilities {
 
 	private static final byte shiftOut = 15;
 
-	public static AS400Resource readAS400File(
+	public static HostResource readAS400File(
 		AS400 as400,
 		String lib,
 		String file,
 		String member)
-		throws IOException, AS400SecurityException, PropertyVetoException,
-		InterruptedException, AS400Exception {
+		throws InterruptedException {
 		QSYSObjectPathName name = new QSYSObjectPathName(
 			lib,
 			file,
@@ -45,7 +44,16 @@ public class AS400Utilities {
 		SequentialFile sequentialFile = new SequentialFile(
 			as400,
 			name.getPath());
-		sequentialFile.setRecordFormat();
+
+		try {
+			sequentialFile.setRecordFormat();
+		} catch (AS400SecurityException e) {
+			throw new HostSecurityException(e);
+		} catch (IOException e) {
+			throw new HostIOException(e);
+		} catch (AS400Exception | PropertyVetoException e) {
+			throw new HostException(e);
+		}
 
 		RecordFormat format = sequentialFile.getRecordFormat();
 
@@ -54,16 +62,15 @@ public class AS400Utilities {
 			length += description.getLength();
 		}
 
-		return new AS400Resource(as400, name, length);
+		return new HostResource(as400, name, length);
 	}
 
-	public static AS400Resource readAS400Source(
+	public static HostResource readAS400Source(
 		AS400 as400,
 		String lib,
 		String file,
 		String member)
-		throws IOException, AS400SecurityException, PropertyVetoException,
-		InterruptedException, AS400Exception {
+		throws InterruptedException {
 		QSYSObjectPathName name = new QSYSObjectPathName(
 			lib,
 			file,
@@ -73,14 +80,23 @@ public class AS400Utilities {
 		SequentialFile sequentialFile = new SequentialFile(
 			as400,
 			name.getPath());
-		sequentialFile.setRecordFormat();
+
+		try {
+			sequentialFile.setRecordFormat();
+		} catch (AS400SecurityException e) {
+			throw new HostSecurityException(e);
+		} catch (IOException e) {
+			throw new HostIOException(e);
+		} catch (AS400Exception | PropertyVetoException e) {
+			throw new HostException(e);
+		}
 
 		RecordFormat format = sequentialFile.getRecordFormat();
 
 		int length = format.getFieldDescription(format.getNumberOfFields() - 1)
 			.getLength();
 
-		return new AS400Resource(as400, name, length);
+		return new HostResource(as400, name, length);
 	}
 
 	public static String addsSpacesAsShiftChars(String original) {
@@ -138,18 +154,20 @@ public class AS400Utilities {
 	public static String[] convert(
 		InputStream input,
 		int length,
-		boolean addsShiftChars)
-		throws IOException {
-		return convert(
-			new AS400Data(U.readBytes(input), length).read(),
-			addsShiftChars);
+		boolean addsShiftChars) {
+		try {
+			return convert(
+				new HostData(U.readBytes(input), length).read(),
+				addsShiftChars);
+		} catch (IOException e) {
+			throw new HostIOException(e);
+		}
 	}
 
 	public static void write(
-		AS400Resource resource,
+		HostResource resource,
 		PrintWriter writer,
-		boolean addsShiftChars)
-		throws IOException, AS400SecurityException {
+		boolean addsShiftChars) {
 		byte[] buffer = new byte[resource.length];
 		try (InputStream input = new BufferedInputStream(resource.open())) {
 			int readed;
@@ -160,14 +178,15 @@ public class AS400Utilities {
 
 			if (readed != -1)
 				throw new IllegalStateException(Integer.toString(readed));
+		} catch (IOException e) {
+			throw new HostIOException(e);
 		}
 	}
 
 	public static void write(
-		AS400Resource resource,
+		HostResource resource,
 		Consumer<String> lineConsumer,
-		boolean addsShiftChars)
-		throws IOException, AS400SecurityException {
+		boolean addsShiftChars) {
 		byte[] buffer = new byte[resource.length];
 		try (InputStream input = new BufferedInputStream(resource.open())) {
 			int readed;
@@ -178,6 +197,8 @@ public class AS400Utilities {
 
 			if (readed != -1)
 				throw new IllegalStateException(Integer.toString(readed));
+		} catch (IOException e) {
+			throw new HostIOException(e);
 		}
 	}
 

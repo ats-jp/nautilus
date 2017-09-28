@@ -37,7 +37,7 @@ public class DynamicController {
 		Path underlineOnlyFields,
 		Path barcodeFields,
 		boolean strict)
-		throws IOException {
+		throws InterruptedException, IOException {
 		Configure configure = null;
 		for (String line : new TextReader(dynamicConfigures.toUri().toURL())
 			.readLinesAsIterator()) {
@@ -53,26 +53,23 @@ public class DynamicController {
 		if (configure == null)
 			throw new IllegalStateException("設定ファイル内に " + ddsName + " が存在しません");
 
-		AS400Data dds, spool;
-		try {
-			dds = AS400Utilities
-				.readAS400Source(
-					as400,
-					configure.ddsLib,
-					configure.ddsFile,
-					ddsName)
-				.createAS400Data();
+		HostData dds, spool;
 
-			spool = AS400Utilities
-				.readAS400File(
-					as400,
-					configure.spoolLib,
-					configure.spoolFile,
-					spoolName)
-				.createAS400Data();
-		} catch (Exception e) {
-			throw new AS400IOException(e);
-		}
+		dds = HostUtilities
+			.readAS400Source(
+				as400,
+				configure.ddsLib,
+				configure.ddsFile,
+				ddsName)
+			.createAS400Data();
+
+		spool = HostUtilities
+			.readAS400File(
+				as400,
+				configure.spoolLib,
+				configure.spoolFile,
+				spoolName)
+			.createAS400Data();
 
 		Result result = new Controller(debugRepository).execute(
 			pdfName,

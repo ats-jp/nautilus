@@ -7,13 +7,13 @@ import java.util.List;
 
 import jp.ats.nautilus.common.U;
 
-public class AS400Data {
+public class HostData {
 
 	private final byte[] data;
 
 	private final int lineLength;
 
-	public AS400Data(byte[] data, int lineLength) throws IOException {
+	public HostData(byte[] data, int lineLength) throws IOException {
 		this.data = data;
 		this.lineLength = lineLength;
 	}

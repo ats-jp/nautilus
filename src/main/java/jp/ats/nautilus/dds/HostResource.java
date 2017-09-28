@@ -13,7 +13,7 @@ import com.ibm.as400.access.QSYSObjectPathName;
 
 import jp.ats.nautilus.common.U;
 
-public class AS400Resource {
+public class HostResource {
 
 	public final int length;
 
@@ -21,18 +21,23 @@ public class AS400Resource {
 
 	private final QSYSObjectPathName name;
 
-	public AS400Resource(AS400 as400, QSYSObjectPathName name, int length) {
+	public HostResource(AS400 as400, QSYSObjectPathName name, int length) {
 		this.as400 = as400;
 		this.name = name;
 		this.length = length;
 	}
 
-	public InputStream open() throws IOException, AS400SecurityException {
-		return new IFSFileInputStream(new IFSFile(as400, name.getPath()));
+	public InputStream open() {
+		try {
+			return new IFSFileInputStream(new IFSFile(as400, name.getPath()));
+		} catch (IOException e) {
+			throw new HostIOException(e);
+		} catch (AS400SecurityException e) {
+			throw new HostSecurityException(e);
+		}
 	}
 
-	public void read(Consumer<byte[]> consumer)
-		throws IOException, AS400SecurityException {
+	public void read(Consumer<byte[]> consumer) {
 		byte[] buffer = new byte[length];
 		try (InputStream input = new BufferedInputStream(open())) {
 			int readed;
@@ -42,14 +47,19 @@ public class AS400Resource {
 
 			if (readed != -1)
 				throw new IllegalStateException(Integer.toString(readed));
+		} catch (IOException e) {
+			throw new HostIOException(e);
 		}
 	}
 
-	public AS400Data createAS400Data()
-		throws IOException, AS400SecurityException {
+	public HostData createAS400Data() {
 		try (InputStream input = new IFSFileInputStream(
 			new IFSFile(as400, name.getPath()))) {
-			return new AS400Data(U.readBytes(input), length);
+			return new HostData(U.readBytes(input), length);
+		} catch (IOException e) {
+			throw new HostIOException(e);
+		} catch (AS400SecurityException e) {
+			throw new HostSecurityException(e);
 		}
 	}
 }

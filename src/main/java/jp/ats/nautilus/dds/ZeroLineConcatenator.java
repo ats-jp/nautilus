@@ -11,7 +11,7 @@ import jp.ats.nautilus.common.U;
  */
 public class ZeroLineConcatenator {
 
-	private static final byte space = " ".getBytes(AS400Utilities.CHARSET)[0];
+	private static final byte space = " ".getBytes(HostUtilities.CHARSET)[0];
 
 	public static byte[][] execute(byte[][] as400Data) {
 		byte[] headerBuffer = new byte[4];
@@ -22,7 +22,7 @@ public class ZeroLineConcatenator {
 
 		for (byte[] line : as400Data) {
 			System.arraycopy(line, 0, headerBuffer, 0, headerBuffer.length);
-			String header = new String(headerBuffer, AS400Utilities.CHARSET);
+			String header = new String(headerBuffer, HostUtilities.CHARSET);
 
 			if (header.charAt(3) != '0' && concatTargets.size() > 0) {
 				concat(concatTargets);

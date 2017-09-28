@@ -59,7 +59,7 @@ public class Controller {
 	public Result execute(
 		String pdfName,
 		String ddsName,
-		AS400Data ddsData,
+		HostData ddsData,
 		int rows,
 		int columns,
 		float lpi,
@@ -68,7 +68,7 @@ public class Controller {
 		int marginTopMM,
 		int recordIndicatorPosition,
 		Rectangle rectangle,
-		AS400Data spoolData,
+		HostData spoolData,
 		String fontDirectory,
 		Path outputDirectory,
 		Path templateDirectory,
@@ -162,7 +162,7 @@ public class Controller {
 
 		Path pdf;
 		try {
-			String[] ddsLines = AS400Utilities.convert(ddsData.read(), false);
+			String[] ddsLines = HostUtilities.convert(ddsData.read(), false);
 
 			if (debugMode) write(ddsLines, saveDirectory.resolve("dds.txt"));
 
@@ -179,7 +179,7 @@ public class Controller {
 			nautilus.setRectangle(rectangle);
 			nautilus.setFontManagerClass(ConcreteFontManager.class);
 
-			String[] spoolLines = AS400Utilities
+			String[] spoolLines = HostUtilities
 				.convert(ZeroLineConcatenator.execute(spoolData.read()), true);
 
 			if (debugMode)
@@ -251,14 +251,14 @@ public class Controller {
 
 		FileInputStream ddsInput = new FileInputStream(
 			new File(saveDirectory, "dds.original"));
-		AS400Data dds = new AS400Data(
+		HostData dds = new HostData(
 			U.readBytes(ddsInput),
 			Integer.parseInt(properties.getProperty("ddsLineLength")));
 		ddsInput.close();
 
 		FileInputStream spoolInput = new FileInputStream(
 			new File(saveDirectory, "spool.original"));
-		AS400Data spool = new AS400Data(
+		HostData spool = new HostData(
 			U.readBytes(spoolInput),
 			Integer.parseInt(properties.getProperty("spoolLineLength")));
 		spoolInput.close();

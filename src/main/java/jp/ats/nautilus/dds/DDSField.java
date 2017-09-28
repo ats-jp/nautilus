@@ -1,6 +1,6 @@
 package jp.ats.nautilus.dds;
 
-import static jp.ats.nautilus.dds.AS400Utilities.addsSpacesAsShiftChars;
+import static jp.ats.nautilus.dds.HostUtilities.addsSpacesAsShiftChars;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
