@@ -1,12 +1,12 @@
 package jp.ats.nautilus.dds;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
 import jp.ats.nautilus.common.MapMap;
-import jp.ats.nautilus.common.TextReader;
 
 public class UnderlineOnlyFieldVendor {
 
@@ -16,10 +16,7 @@ public class UnderlineOnlyFieldVendor {
 	public UnderlineOnlyFieldVendor() {}
 
 	public UnderlineOnlyFieldVendor(Path input) throws IOException {
-		String[] lines = new TextReader(input.toUri().toURL())
-			.readLinesAsArray();
-
-		for (String line : lines) {
+		for (String line : Files.readAllLines(input)) {
 			String[] columns = line.trim().split("\\s+");
 			Set<String> set = map.get(columns[0]).get(columns[1]);
 			if (set == null) {

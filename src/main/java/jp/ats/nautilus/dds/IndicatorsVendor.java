@@ -1,10 +1,10 @@
 package jp.ats.nautilus.dds;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import jp.ats.nautilus.common.MapMap;
-import jp.ats.nautilus.common.TextReader;
 
 public class IndicatorsVendor {
 
@@ -13,10 +13,7 @@ public class IndicatorsVendor {
 	public IndicatorsVendor() {}
 
 	public IndicatorsVendor(Path input) throws IOException {
-		String[] lines = new TextReader(input.toUri().toURL())
-			.readLinesAsArray();
-
-		for (String line : lines) {
+		for (String line : Files.readAllLines(input)) {
 			String[] columns = line.trim().split("\\s+");
 			Indicators indicators = map.get(columns[0]).get(columns[1]);
 			if (indicators == null) {

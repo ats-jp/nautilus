@@ -1,12 +1,12 @@
 package jp.ats.nautilus.dds;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
 import jp.ats.nautilus.common.MapMap;
-import jp.ats.nautilus.common.TextReader;
 
 public class BarcodeFieldVendor {
 
@@ -16,10 +16,7 @@ public class BarcodeFieldVendor {
 	public BarcodeFieldVendor() {}
 
 	public BarcodeFieldVendor(Path input) throws IOException {
-		String[] lines = new TextReader(input.toUri().toURL())
-			.readLinesAsArray();
-
-		for (String line : lines) {
+		for (String line : Files.readAllLines(input)) {
 			String[] columns = line.trim().split("\\s+");
 			Map<String, String> fieldsAndClasses = map.get(columns[0])
 				.get(columns[1]);

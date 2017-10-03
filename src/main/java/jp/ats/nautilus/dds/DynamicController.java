@@ -1,11 +1,11 @@
 package jp.ats.nautilus.dds;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.ibm.as400.access.AS400;
 
-import jp.ats.nautilus.common.TextReader;
 import jp.ats.nautilus.common.U;
 import jp.ats.nautilus.dds.Controller.Result;
 import jp.ats.nautilus.pdf.Rectangle;
@@ -39,8 +39,7 @@ public class DynamicController {
 		boolean strict)
 		throws InterruptedException, IOException {
 		Configure configure = null;
-		for (String line : new TextReader(dynamicConfigures.toUri().toURL())
-			.readLinesAsIterator()) {
+		for (String line : Files.readAllLines(dynamicConfigures)) {
 			if (!U.presents(line)) continue;
 
 			String[] elements = line.split("\\s");

@@ -1,11 +1,11 @@
 package jp.ats.nautilus.dds;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 
 import jp.ats.nautilus.common.CollectionMap;
-import jp.ats.nautilus.common.TextReader;
 import jp.ats.nautilus.pdf.TemplateManager;
 import jp.ats.nautilus.pdf.TemplatePage;
 
@@ -20,10 +20,7 @@ public class TemplateVendor {
 
 	public TemplateVendor(Path input, Path templateDirectory)
 		throws IOException {
-		String[] lines = new TextReader(input.toUri().toURL())
-			.readLinesAsArray();
-
-		for (String line : lines) {
+		for (String line : Files.readAllLines(input)) {
 			if (line.length() == 0) continue;
 			String[] columns = line.trim().split("\\s+");
 			map.put(
