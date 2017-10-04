@@ -1,4 +1,4 @@
-package jp.ats.nautilus.common;
+package jp.ats.nautilus.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +15,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.SAXException;
+
+import jp.ats.nautilus.common.U;
 
 /**
  * @author 千葉 哲嗣

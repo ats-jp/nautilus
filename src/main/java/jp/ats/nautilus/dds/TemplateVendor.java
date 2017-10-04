@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 
-import jp.ats.nautilus.common.CollectionMap;
+import jp.ats.nautilus.internal.CollectionMap;
 import jp.ats.nautilus.pdf.TemplateManager;
 import jp.ats.nautilus.pdf.TemplatePage;
 

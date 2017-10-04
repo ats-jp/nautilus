@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import jp.ats.nautilus.common.MapMap;
+import jp.ats.nautilus.internal.MapMap;
 
 public class IndicatorsVendor {
 

@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import jp.ats.nautilus.common.XPathNode;
+import jp.ats.nautilus.internal.XPathNode;
 
 class TemplateNode extends Node {
 

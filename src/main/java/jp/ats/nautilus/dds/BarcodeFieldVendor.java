@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import jp.ats.nautilus.common.MapMap;
+import jp.ats.nautilus.internal.MapMap;
 
 public class BarcodeFieldVendor {
 

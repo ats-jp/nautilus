@@ -1,4 +1,4 @@
-package jp.ats.nautilus.common;
+package jp.ats.nautilus.internal;
 
 /**
  * @author 千葉 哲嗣

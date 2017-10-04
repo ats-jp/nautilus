@@ -3,7 +3,7 @@ package jp.ats.nautilus.pdf;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import jp.ats.nautilus.common.XPathNode;
+import jp.ats.nautilus.internal.XPathNode;
 import jp.ats.nautilus.pdf.Page.LineDirection;
 import jp.ats.nautilus.pdf.Report.LineType;
 

@@ -17,7 +17,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import jp.ats.nautilus.common.U;
-import jp.ats.nautilus.common.XPathNode;
+import jp.ats.nautilus.internal.XPathNode;
 
 public class Nautilus {
 

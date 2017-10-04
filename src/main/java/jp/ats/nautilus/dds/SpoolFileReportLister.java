@@ -12,8 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import jp.ats.nautilus.common.CP932;
-import jp.ats.nautilus.common.CollectionMap;
 import jp.ats.nautilus.common.U;
+import jp.ats.nautilus.internal.CollectionMap;
 import jp.ats.nautilus.pdf.Nautilus;
 import jp.ats.nautilus.pdf.ReportContext;
 import jp.ats.nautilus.pdf.TemplatePage;

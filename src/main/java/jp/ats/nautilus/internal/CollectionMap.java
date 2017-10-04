@@ -1,4 +1,4 @@
-package jp.ats.nautilus.common;
+package jp.ats.nautilus.internal;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import jp.ats.nautilus.common.U;
+
 import java.util.Set;
 
 /**
