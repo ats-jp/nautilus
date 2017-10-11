@@ -13,6 +13,10 @@ import jp.ats.nautilus.dds.HostHandler;
 import jp.ats.nautilus.dds.HostResource;
 import jp.ats.nautilus.dds.HostUtilities;
 
+/**
+ * CPYSPLF
+ * 制御文字  CTLCHAR(*PRTCTL) 形式のスプールファイルを伸長するツールクラスです。
+ */
 public class SpoolRestorator {
 
 	private static final String filler = new String();
