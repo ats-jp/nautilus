@@ -1,5 +1,7 @@
 package jp.ats.nautilus.dds;
 
+import java.beans.PropertyVetoException;
+
 import com.ibm.as400.access.AS400;
 
 public class HostHandler {
@@ -37,6 +39,13 @@ public class HostHandler {
 	}
 
 	private AS400 create() {
-		return new AS400(address, user, password);
+		AS400 as400 = new AS400(address, user, password);
+		try {
+			as400.setGuiAvailable(false);
+		} catch (PropertyVetoException e) {
+			throw new IllegalStateException(e);
+		}
+
+		return as400;
 	}
 }
