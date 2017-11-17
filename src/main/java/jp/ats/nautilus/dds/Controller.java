@@ -180,6 +180,7 @@ public class Controller {
 			nautilus.setMarginLeft(marginLeftMM);
 			nautilus.setMarginTop(marginTopMM);
 			nautilus.setRectangle(rectangle);
+			nautilus.setAutoAdjust(autoAdjust);
 			nautilus.setFontManagerClass(ConcreteFontManager.class);
 
 			String[] spoolLines = HostUtilities
