@@ -38,6 +38,10 @@ public class Canvas implements AutoCloseable {
 
 	private final float startY;
 
+	private final float autoAdjustRateX;
+
+	private final float autoAdjustRateY;
+
 	private final Rectangle rectangle;
 
 	private final PDDocument document;
@@ -69,6 +73,28 @@ public class Canvas implements AutoCloseable {
 		float marginTopMM, // A4での長さ
 		Rectangle rectangle,
 		OutputStream output) {
+		this(
+			rows,
+			columns,
+			lpi,
+			cpi,
+			marginLeftMM,
+			marginTopMM,
+			rectangle,
+			false,
+			output);
+	}
+
+	public Canvas(
+		int rows,
+		int columns,
+		float lpi,
+		float cpi,
+		float marginLeftMM, // A4での長さ
+		float marginTopMM, // A4での長さ
+		Rectangle rectangle,
+		boolean autoAdjust,
+		OutputStream output) {
 		this.rows = rows;
 		this.columns = columns;
 		this.lpi = lpi;
@@ -82,6 +108,24 @@ public class Canvas implements AutoCloseable {
 
 		float marginLeftPoint = inchPoint / 25.4f * marginLeftMM;
 		float marginTopPoint = inchPoint / 25.4f * marginTopMM;
+
+		if (autoAdjust) {
+			float cellWidth = inchPoint / cpi;
+			float cellHeight = inchPoint / lpi;
+
+			float pageX = rectangle.getWidth() - marginLeftPoint;
+			float pageY = rectangle.getHeight() - marginTopPoint;
+
+			//右と下は1セル分空ける
+			float reportX = cellWidth * (columns + 1);
+			float reportY = cellHeight * (rows + 1);
+
+			autoAdjustRateX = pageX / reportX;
+			autoAdjustRateY = pageY / reportY;
+		} else {
+			autoAdjustRateX = 1f;
+			autoAdjustRateY = 1f;
+		}
 
 		startX = marginLeftPoint;
 		startY = rectangle.getHeight() - marginTopPoint;
@@ -124,8 +168,12 @@ public class Canvas implements AutoCloseable {
 
 	void line(float fromX, float fromY, float toX, float toY) {
 		try {
-			currentStream.moveTo(startX + fromX, startY - fromY);
-			currentStream.lineTo(startX + toX, startY - toY);
+			currentStream.moveTo(
+				startX + fromX * autoAdjustRateX,
+				startY - fromY * autoAdjustRateY);
+			currentStream.lineTo(
+				startX + toX * autoAdjustRateX,
+				startY - toY * autoAdjustRateY);
 		} catch (IOException e) {
 			throw new DocumentException(e);
 		}
@@ -140,8 +188,12 @@ public class Canvas implements AutoCloseable {
 		float toY) {
 		try {
 			currentStream.setLineDashPattern(dashPattern, dashPatternPhase);
-			currentStream.moveTo(startX + fromX, startY - fromY);
-			currentStream.lineTo(startX + toX, startY - toY);
+			currentStream.moveTo(
+				startX + fromX * autoAdjustRateX,
+				startY - fromY * autoAdjustRateY);
+			currentStream.lineTo(
+				startX + toX * autoAdjustRateX,
+				startY - toY * autoAdjustRateY);
 		} catch (IOException e) {
 			throw new DocumentException(e);
 		}
@@ -175,12 +227,12 @@ public class Canvas implements AutoCloseable {
 			currentStream.beginText();
 			currentStream.setTextMatrix(
 				new Matrix(
-					horizontalSize,
+					horizontalSize * autoAdjustRateX,
 					0,
 					0,
-					verticalSize,
-					startX + x,
-					startY - y));
+					verticalSize * autoAdjustRateY,
+					startX + x * autoAdjustRateX,
+					startY - y * autoAdjustRateY));
 			currentStream.showText(text);
 			currentStream.endText();
 		} catch (IOException e) {
@@ -214,16 +266,17 @@ public class Canvas implements AutoCloseable {
 
 			float magnification = factory.magnification();
 
-			float height = image.getHeight() * magnification;
+			float width = image.getWidth() * magnification * autoAdjustRateY;
+			float height = image.getHeight() * magnification * autoAdjustRateX;
 			currentStream.drawImage(
 				image,
 				new Matrix(
-					image.getWidth() * magnification,
+					width,
 					0,
 					0,
 					height,
-					startX + x,
-					startY - y - height));
+					startX + x * autoAdjustRateX,
+					startY - y * autoAdjustRateY - height));
 		} catch (IOException e) {
 			throw new DocumentException(e);
 		}
@@ -233,7 +286,11 @@ public class Canvas implements AutoCloseable {
 		try {
 			currentStream.setNonStrokingColor(color);
 
-			currentStream.addRect(startX + x, startY - y, width, height * -1);
+			currentStream.addRect(
+				startX + x * autoAdjustRateX,
+				startY - y * autoAdjustRateY,
+				width * autoAdjustRateX,
+				height * -1 * autoAdjustRateY);
 
 			currentStream.fill();
 
@@ -247,8 +304,11 @@ public class Canvas implements AutoCloseable {
 		try {
 			currentStream.setNonStrokingColor(color);
 
-			currentStream
-				.addRect(0, 0, rectangle.getWidth(), rectangle.getHeight());
+			currentStream.addRect(
+				0,
+				0,
+				rectangle.getWidth() * autoAdjustRateX,
+				rectangle.getHeight() * autoAdjustRateY);
 
 			currentStream.fill();
 

@@ -82,6 +82,7 @@ public class DynamicController {
 			configure.marginTopMM,
 			configure.recordIndicatorPosition,
 			configure.rectangle,
+			configure.autoAdjust,
 			spool,
 			fontPath,
 			outputDirectory,
@@ -122,6 +123,8 @@ public class DynamicController {
 
 		private final Rectangle rectangle;
 
+		private final boolean autoAdjust;
+
 		private final String spoolLib;
 
 		private final String spoolFile;
@@ -137,8 +140,9 @@ public class DynamicController {
 			marginTopMM = Integer.parseInt(elements[8]);
 			recordIndicatorPosition = Integer.parseInt(elements[9]);
 			rectangle = Rectangle.valueOf(elements[10]);
-			spoolLib = elements[11];
-			spoolFile = elements[12];
+			autoAdjust = Boolean.valueOf(elements[11]);
+			spoolLib = elements[12];
+			spoolFile = elements[13];
 		}
 	}
 }

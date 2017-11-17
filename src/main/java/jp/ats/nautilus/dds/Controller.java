@@ -45,7 +45,8 @@ public class Controller {
 	 * @param marginLeftMM 左マージン(mm)
 	 * @param marginTopMM 上マージン(mm)
 	 * @param recordIndicatorPosition スプール内のレコード指示コード位置
-	 * @param page 出力形式
+	 * @param rectangle 出力形式
+	 * @param autoAdjust ページサイズ自動調節
 	 * @param spoolData スプール生データ
 	 * @param fontPath 拡張フォント置場
 	 * @param outputDirectory PDF出力場所
@@ -68,6 +69,7 @@ public class Controller {
 		int marginTopMM,
 		int recordIndicatorPosition,
 		Rectangle rectangle,
+		boolean autoAdjust,
 		HostData spoolData,
 		String fontDirectory,
 		Path outputDirectory,
@@ -110,6 +112,7 @@ public class Controller {
 				"recordIndicatorPosition",
 				String.valueOf(recordIndicatorPosition));
 			properties.setProperty("rectangle", rectangle.name());
+			properties.setProperty("autoAdjust", String.valueOf(autoAdjust));
 			properties.setProperty("fontDirectory", fontDirectory);
 			properties.setProperty(
 				"outputDirectory",
@@ -275,6 +278,7 @@ public class Controller {
 			Integer.parseInt(properties.getProperty("marginTopMM")),
 			Integer.parseInt(properties.getProperty("recordIndicatorPosition")),
 			Rectangle.valueOf(properties.getProperty("rectangle")),
+			Boolean.parseBoolean("autoAdjust"),
 			spool,
 			U.care(properties.getProperty("fontPath")),
 			Paths.get(U.care(properties.getProperty("outputDirectory"))),

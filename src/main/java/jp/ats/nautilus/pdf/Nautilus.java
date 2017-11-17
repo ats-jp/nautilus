@@ -37,6 +37,8 @@ public class Nautilus {
 
 	private Rectangle rectangle = Rectangle.A4_LANDSCAPE;
 
+	private boolean autoAdjust = false;
+
 	private List<TemplateNode> templates = U.newLinkedList();
 
 	private List<Page> pages = U.newLinkedList();
@@ -78,6 +80,10 @@ public class Nautilus {
 		this.rectangle = rectangle;
 	}
 
+	public void setAutoAdjust(boolean autoAdjust) {
+		this.autoAdjust = autoAdjust;
+	}
+
 	public void addTemplate(TemplatePage templatePage) {
 		templates.add(new TemplateNode(templatePage));
 	}
@@ -116,6 +122,9 @@ public class Nautilus {
 			root.setAttribute("font-manager", fontManagerClass.getName());
 
 		root.setAttribute("page-size", rectangle.name());
+
+		root.setAttribute("auto-adjust", String.valueOf(autoAdjust));
+
 		document.appendChild(root);
 
 		for (TemplateNode node : templates) {
@@ -174,6 +183,9 @@ public class Nautilus {
 			rectangle = Rectangle
 				.valueOf(report.selectNode("@page-size").getNodeValue());
 
+			autoAdjust = Boolean
+				.parseBoolean(report.selectNode("@auto-adjust").getNodeName());
+
 			XPathNode[] templateNodes = report.selectNodes("template");
 			for (XPathNode node : templateNodes) {
 				templates.add(new TemplateNode(node));
@@ -227,6 +239,7 @@ public class Nautilus {
 				marginLeftMM,
 				marginTopMM,
 				rectangle,
+				autoAdjust,
 				output);
 
 			if (fontManagerClass != null) {
