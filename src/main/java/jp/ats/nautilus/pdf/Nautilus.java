@@ -237,17 +237,17 @@ public class Nautilus {
 
 			if (templates.size() == 0) {
 				for (Page page : pages) {
+					report.newPage();
 					if (drawsGrid) report.drawGrid();
 					page.draw(report);
-					report.newPage();
 				}
 			} else {
 				for (Page page : pages) {
 					for (TemplateNode template : templates) {
+						report.newPage();
 						if (drawsGrid) report.drawGrid();
 						template.draw(report);
 						page.draw(report);
-						report.newPage();
 					}
 				}
 			}
