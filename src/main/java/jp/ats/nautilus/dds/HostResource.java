@@ -2,6 +2,7 @@ package jp.ats.nautilus.dds;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.function.Consumer;
 
 import com.ibm.as400.access.AS400;
@@ -36,16 +37,25 @@ public class HostResource {
 		}
 	}
 
+	private static final int MULTIPLE = 1000;
+
 	public void read(Consumer<byte[]> consumer) {
-		byte[] buffer = new byte[length];
+		byte[] buffer = new byte[length * MULTIPLE];
+
+		ByteBuffer bb = ByteBuffer.wrap(buffer);
+
+		byte[] lineBuffer = new byte[length];
 		try (InputStream input = U.wrap(open())) {
 			int readed;
-			while ((readed = input.read(buffer)) == length) {
-				consumer.accept(buffer);
-			}
+			while ((readed = input.read(buffer)) != -1) {
+				bb.limit(readed);
+				while (bb.hasRemaining()) {
+					bb.get(lineBuffer);
+					consumer.accept(lineBuffer);
+				}
 
-			if (readed != -1)
-				throw new IllegalStateException(Integer.toString(readed));
+				bb.position(0);
+			}
 		} catch (IOException e) {
 			throw new HostIOException(e);
 		}
