@@ -3,7 +3,7 @@ package jp.ats.nautilus.pdf;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.fontbox.ttf.CmapSubtable;
+import org.apache.fontbox.ttf.CmapLookup;
 import org.apache.fontbox.ttf.TTFParser;
 import org.apache.fontbox.ttf.TrueTypeCollection;
 import org.apache.fontbox.ttf.TrueTypeFont;
@@ -16,7 +16,7 @@ public abstract class Font {
 
 	private final TrueTypeFont font;
 
-	private final CmapSubtable cmap;
+	private final CmapLookup cmap;
 
 	public Font() {
 		font = trueTypeFont();
@@ -36,9 +36,9 @@ public abstract class Font {
 		}
 	}
 
-	protected CmapSubtable cmap() {
+	protected CmapLookup cmap() {
 		try {
-			return font.getUnicodeCmap();
+			return font.getUnicodeCmapLookup();
 		} catch (IOException e) {
 			throw new DocumentException(e);
 		}

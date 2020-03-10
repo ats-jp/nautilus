@@ -6,7 +6,6 @@ import java.util.List;
 import jp.ats.nautilus.common.U;
 import jp.ats.nautilus.pdf.Nautilus;
 import jp.ats.nautilus.pdf.Page;
-import jp.ats.nautilus.pdf.ReportContext;
 
 public abstract class ReportLister {
 

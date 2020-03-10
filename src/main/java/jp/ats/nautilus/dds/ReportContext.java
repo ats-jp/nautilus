@@ -1,4 +1,4 @@
-package jp.ats.nautilus.pdf;
+package jp.ats.nautilus.dds;
 
 import java.util.List;
 

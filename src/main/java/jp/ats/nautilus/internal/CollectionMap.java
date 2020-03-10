@@ -35,7 +35,7 @@ public class CollectionMap<K, V> implements Cloneable {
 	public CollectionMap(
 		@SuppressWarnings("rawtypes") Class<? extends Map> mapClass) {
 		try {
-			this.map = mapClass.newInstance();
+			this.map = mapClass.getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

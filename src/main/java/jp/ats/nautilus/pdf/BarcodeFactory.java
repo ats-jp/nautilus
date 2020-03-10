@@ -14,7 +14,7 @@ public interface BarcodeFactory {
 
 	default BarcodeGenerator createBarcodeGenerator() {
 		try {
-			return getBarcodeGeneratorClass().newInstance();
+			return getBarcodeGeneratorClass().getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}

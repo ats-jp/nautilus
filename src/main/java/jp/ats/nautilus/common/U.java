@@ -245,7 +245,7 @@ public class U {
 			Class<?> clazz = Class.forName(className);
 
 			@SuppressWarnings("unchecked")
-			T instance = (T) clazz.newInstance();
+			T instance = (T) clazz.getDeclaredConstructor().newInstance();
 
 			return instance;
 		} catch (Exception e) {
@@ -1676,7 +1676,7 @@ public class U {
 			Class<?> clazz = Class.forName(className);
 
 			@SuppressWarnings("unchecked")
-			T instance = (T) clazz.newInstance();
+			T instance = (T) clazz.getDeclaredConstructor().newInstance();
 
 			return instance;
 		} catch (Exception e) {

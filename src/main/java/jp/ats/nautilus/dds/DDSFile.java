@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import jp.ats.nautilus.common.U;
-import jp.ats.nautilus.pdf.ReportContext;
 
 public class DDSFile {
 

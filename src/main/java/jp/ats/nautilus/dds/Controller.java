@@ -18,7 +18,6 @@ import jp.ats.nautilus.common.U;
 import jp.ats.nautilus.pdf.DocumentException;
 import jp.ats.nautilus.pdf.Nautilus;
 import jp.ats.nautilus.pdf.Rectangle;
-import jp.ats.nautilus.pdf.ReportContext;
 
 public class Controller {
 

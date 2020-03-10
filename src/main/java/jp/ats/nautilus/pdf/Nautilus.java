@@ -243,7 +243,9 @@ public class Nautilus {
 				output);
 
 			if (fontManagerClass != null) {
-				report = new Report(canvas, fontManagerClass.newInstance());
+				report = new Report(
+					canvas,
+					fontManagerClass.getDeclaredConstructor().newInstance());
 			} else {
 				report = new Report(canvas);
 			}

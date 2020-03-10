@@ -9,7 +9,6 @@ import com.ibm.as400.access.AS400;
 import jp.ats.nautilus.common.U;
 import jp.ats.nautilus.dds.Controller.Result;
 import jp.ats.nautilus.pdf.Rectangle;
-import jp.ats.nautilus.pdf.ReportContext;
 
 public class DynamicController {
 
