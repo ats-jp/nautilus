@@ -262,7 +262,7 @@ public class Canvas implements AutoCloseable {
 			byte[] barcodeBytes = output.toByteArray();
 
 			PDImageXObject image = PDImageXObject
-				.createFromByteArray(document, barcodeBytes, null);
+				.createFromByteArray(document, barcodeBytes, barcode);
 
 			float magnification = factory.magnification();
 
